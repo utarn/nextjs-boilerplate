@@ -1,0 +1,124 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: boilerplate-app
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      # ---- Application ----
+      NEXT_PUBLIC_APP_NAME: "Next.js Boilerplate"
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      PORT: 3000
+      # ---- Database (PostgreSQL) ----
+      DATABASE_URL: postgresql://boilerplate:boilerplate123@postgres:5432/boilerplate
+      # ---- Redis (BullMQ) ----
+      REDIS_URL: redis://redis:6379
+      # ---- Encryption ----
+      ENCRYPTION_SECRET: 1234567890abcdef1234567890abcdef
+      # ---- SMTP (for magic link emails) ----
+      SMTP_HOST: smtp.example.com
+      SMTP_PORT: 587
+      SMTP_USER: noreply
+      SMTP_PASS: password
+      SMTP_SENDER_EMAIL: noreply@example.com
+      SMTP_SENDER_NAME: "Boilerplate"
+      SMTP_USE_SSL: false
+      SMTP_INSECURE_SKIP_VERIFY: true
+      # ---- Admin Bootstrap ----
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_DISPLAY_NAME: "Admin User"
+      # ---- Google OAuth ----
+      GOOGLE_CLIENT_ID: your-google-client-id
+      GOOGLE_CLIENT_SECRET: your-google-client-secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    command: sh -c "npx prisma migrate deploy && npm run db:seed && npm run dev"
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: boilerplate-worker
+    environment:
+      # ---- Application ----
+      NEXT_PUBLIC_APP_NAME: "Next.js Boilerplate"
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      PORT: 3000
+      # ---- Database (PostgreSQL) ----
+      DATABASE_URL: postgresql://boilerplate:boilerplate123@postgres:5432/boilerplate
+      # ---- Redis (BullMQ) ----
+      REDIS_URL: redis://redis:6379
+      # ---- Encryption ----
+      ENCRYPTION_SECRET: 1234567890abcdef1234567890abcdef
+      # ---- SMTP (for magic link emails) ----
+      SMTP_HOST: smtp.example.com
+      SMTP_PORT: 587
+      SMTP_USER: noreply
+      SMTP_PASS: password
+      SMTP_SENDER_EMAIL: noreply@example.com
+      SMTP_SENDER_NAME: "Boilerplate"
+      SMTP_USE_SSL: false
+      SMTP_INSECURE_SKIP_VERIFY: true
+      # ---- Admin Bootstrap ----
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_DISPLAY_NAME: "Admin User"
+      # ---- Google OAuth ----
+      GOOGLE_CLIENT_ID: your-google-client-id
+      GOOGLE_CLIENT_SECRET: your-google-client-secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+      - storage_data:/app/storage
+    command: sh -c "npx prisma migrate deploy && npm run worker"
+
+  postgres:
+    image: postgres:18-alpine
+    container_name: boilerplate-postgres
+    environment:
+      POSTGRES_USER: boilerplate
+      POSTGRES_PASSWORD: boilerplate123
+      POSTGRES_DB: boilerplate
+    ports:
+      - "5442:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U boilerplate -d boilerplate"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: boilerplate-redis
+    ports:
+      - "6388:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+  storage_data:

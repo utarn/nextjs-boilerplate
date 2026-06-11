@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "กำลังโหลด...",
+    "error": "เกิดข้อผิดพลาด",
+    "save": "บันทึก",
+    "cancel": "ยกเลิก",
+    "delete": "ลบ",
+    "edit": "แก้ไข",
+    "submit": "ส่ง",
+    "logout": "ออกจากระบบ",
+    "login": "เข้าสู่ระบบ",
+    "dashboard": "แดชบอร์ด",
+    "profile": "โปรไฟล์",
+    "settings": "การตั้งค่า",
+    "back": "ย้อนกลับ",
+    "yes": "ใช่",
+    "no": "ไม่ใช่"
+  },
+  "auth": {
+    "loginTitle": "เข้าสู่ระบบ",
+    "loginSubtitle": "เข้าสู่ระบบของคุณ",
+    "googleLogin": "เข้าสู่ระบบด้วย Google",
+    "magicLinkLogin": "เข้าสู่ระบบด้วยอีเมลลิงก์",
+    "emailPlaceholder": "กรุณากรอกอีเมล",
+    "sendMagicLink": "ส่งลิงก์เข้าสู่ระบบ",
+    "magicLinkSent": "กรุณาตรวจสอบอีเมลของคุณเพื่อรับลิงก์เข้าสู่ระบบ",
+    "or": "หรือ"
+  },
+  "nav": {
+    "dashboard": "แดชบอร์ด",
+    "todos": "รายการที่ต้องทำ",
+    "profile": "โปรไฟล์",
+    "settings": "การตั้งค่า",
+    "admin": "ผู้ดูแลระบบ",
+    "logout": "ออกจากระบบ"
+  },
+  "todos": {
+    "title": "รายการที่ต้องทำของฉัน",
+    "addTodo": "เพิ่มรายการ",
+    "noTodos": "ยังไม่มีรายการ สร้างรายการใหม่เพื่อเริ่มต้น!",
+    "pending": "รอดำเนินการ",
+    "inProgress": "กำลังดำเนินการ",
+    "completed": "เสร็จสมบูรณ์",
+    "cancelled": "ยกเลิก",
+    "titlePlaceholder": "ชื่อรายการ",
+    "descriptionPlaceholder": "คำอธิบาย (ไม่จำเป็น)",
+    "dueDate": "วันครบกำหนด",
+    "status": "สถานะ"
+  },
+  "theme": {
+    "light": "สว่าง",
+    "dark": "มืด",
+    "system": "ระบบ"
+  },
+  "language": {
+    "en": "English",
+    "th": "ไทย"
+  }
+}

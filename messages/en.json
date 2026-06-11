@@ -1,0 +1,59 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "logout": "Logout",
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "back": "Back",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "loginSubtitle": "Sign in to your account",
+    "googleLogin": "Sign in with Google",
+    "magicLinkLogin": "Sign in with email link",
+    "emailPlaceholder": "Enter your email",
+    "sendMagicLink": "Send magic link",
+    "magicLinkSent": "Check your email for a login link",
+    "or": "or"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "todos": "Todos",
+    "profile": "Profile",
+    "settings": "Settings",
+    "admin": "Admin",
+    "logout": "Logout"
+  },
+  "todos": {
+    "title": "My Todos",
+    "addTodo": "Add Todo",
+    "noTodos": "No todos yet. Create one to get started!",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "titlePlaceholder": "Todo title",
+    "descriptionPlaceholder": "Description (optional)",
+    "dueDate": "Due Date",
+    "status": "Status"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "en": "English",
+    "th": "ไทย"
+  }
+}
