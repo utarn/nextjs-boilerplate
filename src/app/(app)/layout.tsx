@@ -10,6 +10,7 @@ import { SocketProvider } from '@/components/providers/SocketProvider'
  * Layout for authenticated routes.
  * Server component that reads the JWT cookie, verifies it, and fetches the
  * user from the database. Redirects to /login if the session is invalid.
+ * Passes DB-stored theme/colorMode as defaults for cross-device persistence.
  */
 export default async function AppGroupLayout({
   children,
@@ -30,9 +31,18 @@ export default async function AppGroupLayout({
   }
 
   // Fetch fresh user data from DB to ensure status is current
+  // Also fetch theme and colorMode for cross-device preference sync
   const user = await prisma.webUser.findUnique({
     where: { id: payload.userId },
-    select: { id: true, email: true, displayName: true, role: true, status: true },
+    select: {
+      id: true,
+      email: true,
+      displayName: true,
+      role: true,
+      status: true,
+      theme: true,
+      colorMode: true,
+    },
   })
 
   if (!user || user.status !== UserStatus.ACTIVE) {
@@ -47,6 +57,8 @@ export default async function AppGroupLayout({
           displayName: user.displayName,
           role: user.role,
         }}
+        defaultTheme={user.theme}
+        defaultColorMode={user.colorMode}
       >
         {children}
       </AppLayout>
