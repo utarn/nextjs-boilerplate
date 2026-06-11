@@ -40,7 +40,16 @@ export async function parseBody<T>(
   request: Request,
 ): Promise<{ body: T; error?: undefined } | { body?: undefined; error: NextResponse }> {
   try {
-    const body = (await request.json()) as T
+    const parsed = await request.json()
+
+    // Guard against null/array/primitives that would crash on destructuring
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {
+        error: NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 }),
+      }
+    }
+
+    const body = parsed as T
     return { body }
   } catch {
     return {

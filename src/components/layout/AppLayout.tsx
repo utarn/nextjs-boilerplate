@@ -1,12 +1,15 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Menu, Home, CheckSquare, User, Settings, LogOut, LayoutDashboard } from 'lucide-react'
+import { Menu, CheckSquare, User, Settings, LogOut, LayoutDashboard } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Separator } from '@/components/ui/separator'
 import { LanguageToggle } from '@/components/layout/LanguageToggle'
 import { ThemePickerDropdown } from '@/components/layout/ThemePickerDropdown'
+import { ColorModeToggle } from '@/components/layout/ColorModeToggle'
+import { ThemeInitializer } from '@/components/providers/ThemeInitializer'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -17,9 +20,11 @@ interface AppLayoutProps {
     displayName: string
     role: string
   }
+  defaultTheme?: string | null
+  defaultColorMode?: string | null
 }
 
-export function AppLayout({ children, user }: AppLayoutProps) {
+export function AppLayout({ children, user, defaultTheme, defaultColorMode }: AppLayoutProps) {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -39,12 +44,19 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const isActive = (href: string) => pathname?.startsWith(href)
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' })
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } catch {
+      // Non-critical: fall through to redirect
+    }
     window.location.href = '/'
   }
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Theme initializer: syncs DB-stored preferences on mount */}
+      <ThemeInitializer theme={defaultTheme} colorMode={defaultColorMode} />
+
       {/* Desktop sidebar */}
       <div className="hidden md:flex h-full w-64 flex-col fixed inset-y-0 z-50 border-r">
         <div className="p-4 border-b">
@@ -66,6 +78,11 @@ export function AppLayout({ children, user }: AppLayoutProps) {
         </nav>
         <div className="p-4 border-t space-y-1">
           <p className="text-xs text-muted-foreground px-3 truncate">{user.email}</p>
+          <div className="flex items-center gap-1 justify-center py-1">
+            <ColorModeToggle />
+            <ThemePickerDropdown />
+            <LanguageToggle />
+          </div>
           <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
             <LogOut className="h-5 w-5 mr-3" />
             {t('logout')}
@@ -96,21 +113,27 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   {item.label}
                 </Link>
               ))}
-              <Button variant="ghost" className="justify-start mt-4" onClick={handleLogout}>
+            </nav>
+            <Separator className="my-2" />
+            <div className="flex items-center gap-1 justify-center py-2">
+              <ColorModeToggle />
+              <ThemePickerDropdown />
+              <LanguageToggle />
+            </div>
+            <Separator className="my-2" />
+            <div className="px-2">
+              <Button variant="ghost" className="justify-start w-full" onClick={handleLogout}>
                 <LogOut className="h-5 w-5 mr-3" />
                 {t('logout')}
               </Button>
-            </nav>
+            </div>
           </SheetContent>
         </Sheet>
         <h1 className="text-lg font-bold ml-4">Next.js Boilerplate</h1>
       </div>
 
       {/* Top bar */}
-      <div className="fixed top-0 right-0 md:left-64 h-14 border-b bg-background z-40 flex items-center justify-end px-4 gap-2">
-        <ThemePickerDropdown />
-        <LanguageToggle />
-      </div>
+      <div className="fixed top-0 right-0 md:left-64 h-14 border-b bg-background z-40" />
 
       {/* Main content */}
       <main className="md:ml-64 pt-14 md:pt-14 min-h-screen">

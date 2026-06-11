@@ -1,40 +1,60 @@
-'use client'
+"use client"
 
-import { Moon, Sun, Monitor } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useTheme } from "@/components/providers/ThemeProvider"
+import { THEME_CATALOG, CATEGORY_LABELS } from "@/lib/theme-catalog"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useTheme } from '@/components/providers/ThemeProvider'
+} from "@/components/ui/dropdown-menu"
+import { Palette, Check } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 
 export function ThemePickerDropdown() {
-  const { colorMode, setColorMode } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const t = useTranslations("ThemeGallery")
+
+  // Show a condensed list organized by category
+  const categories = Array.from(new Set(THEME_CATALOG.map((t) => t.category)))
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+        <Button variant="ghost" size="icon" title={t("title")}>
+          <Palette className="size-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setColorMode('light')} className={colorMode === 'light' ? 'bg-accent' : ''}>
-          <Sun className="h-4 w-4 mr-2" />
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setColorMode('dark')} className={colorMode === 'dark' ? 'bg-accent' : ''}>
-          <Moon className="h-4 w-4 mr-2" />
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setColorMode('system')} className={colorMode === 'system' ? 'bg-accent' : ''}>
-          <Monitor className="h-4 w-4 mr-2" />
-          System
-        </DropdownMenuItem>
+      <DropdownMenuContent align="end" className="max-h-80 overflow-y-auto">
+        {categories.map((cat, catIdx) => (
+          <div key={cat}>
+            {catIdx > 0 && <DropdownMenuSeparator />}
+            <DropdownMenuLabel className="text-xs text-muted-foreground">
+              {CATEGORY_LABELS[cat] || cat}
+            </DropdownMenuLabel>
+            {THEME_CATALOG.filter((entry) => entry.category === cat).map((entry) => (
+              <DropdownMenuItem
+                key={entry.key}
+                onClick={() => setTheme(entry.key, true)}
+                className={theme === entry.key ? "bg-accent" : ""}
+              >
+                <span
+                  className="inline-block w-3 h-3 rounded-sm border mr-2 shrink-0"
+                  style={{ backgroundColor: entry.preview.primary }}
+                />
+                <span className="truncate">{entry.label}</span>
+                {theme === entry.key && (
+                  <span className="ml-auto text-primary">
+                    <Check className="size-4" />
+                  </span>
+                )}
+              </DropdownMenuItem>
+            ))}
+          </div>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )
