@@ -132,5 +132,124 @@
   "language": {
     "en": "English",
     "th": "ไทย"
+  },
+  "Landing": {
+    "navbar": {
+      "brand": "TaskFlow",
+      "home": "Home",
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "targetAudience": "For Everyone",
+      "aboutUs": "About Us",
+      "login": "Sign In",
+      "dashboard": "Dashboard",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "badge": "Organize your tasks before they pile up",
+      "title": "Organize Your Work,",
+      "titleHighlight": "Ship with Confidence",
+      "subtitle": "A powerful todo management platform for modern teams. Create, track, and complete tasks with real-time collaboration, beautiful themes, and seamless workflows.",
+      "cta": "Get Started Free",
+      "ctaSecondary": "View All Features",
+      "learnMore": "Learn More",
+      "dashboard": "Dashboard",
+      "stats": {
+        "messages": "Tasks Created",
+        "users": "Active Users",
+        "uptime": "Uptime"
+      }
+    },
+    "valueProps": {
+      "title": "Why TaskFlow",
+      "subtitle": "A productivity platform designed to help you and your team stay organized and focused",
+      "organize": {
+        "title": "Smart Organization",
+        "description": "Organize tasks with labels, priorities, due dates, and custom lists. Everything stays neatly structured and easy to find."
+      },
+      "search": {
+        "title": "Instant Search",
+        "description": "Search across all your tasks, notes, and projects in milliseconds. Filter by status, priority, date, and assignee."
+      },
+      "reliable": {
+        "title": "Secure and Reliable",
+        "description": "Your data is encrypted, backed up, and stored securely. Role-based access control keeps your information safe."
+      }
+    },
+    "features": {
+      "title": "Complete Feature Set",
+      "subtitle": "Everything you need to manage tasks and boost productivity",
+      "crud": {
+        "title": "Full Task Management",
+        "description": "Create, edit, organize, and track tasks with ease. Support for subtasks, checklists, file attachments, and due dates."
+      },
+      "realTime": {
+        "title": "Real-Time Updates",
+        "description": "See changes instantly as your team works. Powered by Socket.IO for live collaboration and instant notifications."
+      },
+      "themes": {
+        "title": "42 Beautiful Themes",
+        "description": "Personalize your workspace with 42 handcrafted themes. Both light and dark modes available for every theme."
+      },
+      "backgroundJobs": {
+        "title": "Background Processing",
+        "description": "Schedule reminders, send email notifications, and process recurring tasks automatically with BullMQ queues."
+      },
+      "responsive": {
+        "title": "Fully Responsive Design",
+        "description": "Access your tasks from any device — desktop, tablet, or mobile. The interface adapts seamlessly to any screen size."
+      },
+      "i18n": {
+        "title": "Multilingual Support",
+        "description": "Available in English and Thai, with the ability to switch languages at any time without losing your context."
+      }
+    },
+    "howItWorks": {
+      "title": "Get Started in 3 Easy Steps",
+      "subtitle": "Start managing your tasks effectively in minutes",
+      "step1": {
+        "title": "Create an Account",
+        "description": "Sign up with your email or Google Account in seconds. No credit card required."
+      },
+      "step2": {
+        "title": "Create Your Tasks",
+        "description": "Add tasks with titles, descriptions, due dates, and priorities. Organize them into projects and lists."
+      },
+      "step3": {
+        "title": "Stay Productive",
+        "description": "Track progress, collaborate with your team, and complete tasks. Get reminders and celebrate achievements."
+      }
+    },
+    "targetAudience": {
+      "title": "Designed for Everyone",
+      "subtitle": "No matter who you are, TaskFlow helps you stay organized and productive",
+      "professional": {
+        "title": "Professionals",
+        "description": "Manage work projects, deadlines, and priorities. Stay on top of your responsibilities."
+      },
+      "students": {
+        "title": "Students",
+        "description": "Track assignments, study schedules, and group projects. Never miss a deadline again."
+      },
+      "teams": {
+        "title": "Teams and Organizations",
+        "description": "Collaborate on shared projects, assign tasks, and monitor progress across your team."
+      },
+      "personal": {
+        "title": "Personal Use",
+        "description": "Organize your daily life with shopping lists, reminders, goals, and personal projects."
+      }
+    },
+    "credits": {
+      "title": "Built with Leading Technology",
+      "subtitle": "Powered by modern and reliable technologies",
+      "developer": "Developer",
+      "faculty": "Faculty of Science and Technology",
+      "stack": "RMUTSB"
+    },
+    "footer": {
+      "rights": "All rights reserved.",
+      "tagline": "Organize your work, ship with confidence"
+    }
   }
 }
