@@ -16,15 +16,34 @@
     "yes": "Yes",
     "no": "No"
   },
-  "auth": {
-    "loginTitle": "Sign in",
-    "loginSubtitle": "Sign in to your account",
-    "googleLogin": "Sign in with Google",
-    "magicLinkLogin": "Sign in with email link",
-    "emailPlaceholder": "Enter your email",
-    "sendMagicLink": "Send magic link",
-    "magicLinkSent": "Check your email for a login link",
-    "or": "or"
+  "Login": {
+    "title": "Sign In",
+    "description": "Enter your email to sign in to your account!",
+    "signInWithGoogle": "Sign in with Google",
+    "orContinueWithEmail": "or continue with email",
+    "errorDomainNotAllowed": "Your email domain is not allowed.",
+    "errorEmailRequired": "Email is required.",
+    "errorNetwork": "Network error. Please try again.",
+    "errorSendFailed": "Failed to send magic link. Please try again.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "info@gmail.com",
+    "sendMagicLink": "Send Magic Link",
+    "sending": "Sending...",
+    "checkEmail": "Check your email",
+    "sentTo": "We sent a sign-in link to {email}",
+    "resendHint": "The link expires in 15 minutes.",
+    "tryAgain": "Try again with a different email",
+    "brandTagline": "Your productivity platform",
+    "dismiss": "Dismiss"
+  },
+  "Pending": {
+    "pendingTitle": "Awaiting Approval",
+    "pendingMessage": "Your account is currently pending approval by an administrator. You will receive an email once your account has been reviewed.",
+    "rejectedTitle": "Account Not Approved",
+    "rejectedMessage": "Your account request was not approved. If you believe this is an error, please contact your administrator.",
+    "deactivatedTitle": "Account Deactivated",
+    "deactivatedMessage": "Your account has been deactivated. Please contact your administrator if you believe this is an error.",
+    "logout": "Sign Out"
   },
   "nav": {
     "dashboard": "Dashboard",

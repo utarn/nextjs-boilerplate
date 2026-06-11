@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { NextIntlClientProvider } from 'next-intl'
-import { LoginPageClient } from '@/app/(auth)/login/login-client'
+import { LoginClient } from '@/app/(auth)/login/login-client'
 import enMessages from '../../messages/en.json'
 
 function renderWithProviders(ui: React.ReactElement) {
@@ -14,24 +14,30 @@ function renderWithProviders(ui: React.ReactElement) {
 
 describe('LoginPage', () => {
   it('should render the login form', () => {
-    renderWithProviders(<LoginPageClient />)
+    renderWithProviders(<LoginClient googleClientId="test-client-id" />)
 
-    expect(screen.getByText('Sign in')).toBeInTheDocument()
+    expect(screen.getByText('Sign In')).toBeInTheDocument()
     expect(screen.getByText('Sign in with Google')).toBeInTheDocument()
-    expect(screen.getByText('Send magic link')).toBeInTheDocument()
+    expect(screen.getByText('Send Magic Link')).toBeInTheDocument()
   })
 
   it('should render the email input', () => {
-    renderWithProviders(<LoginPageClient />)
+    renderWithProviders(<LoginClient googleClientId="test-client-id" />)
 
-    const emailInput = screen.getByPlaceholderText('Enter your email')
+    const emailInput = screen.getByPlaceholderText('info@gmail.com')
     expect(emailInput).toBeInTheDocument()
   })
 
   it('should render the Google login button', () => {
-    renderWithProviders(<LoginPageClient />)
+    renderWithProviders(<LoginClient googleClientId="test-client-id" />)
 
     const googleButton = screen.getByText('Sign in with Google')
     expect(googleButton).toBeInTheDocument()
+  })
+
+  it('should not render Google button when googleClientId is null', () => {
+    renderWithProviders(<LoginClient googleClientId={null} />)
+
+    expect(screen.queryByText('Sign in with Google')).not.toBeInTheDocument()
   })
 })

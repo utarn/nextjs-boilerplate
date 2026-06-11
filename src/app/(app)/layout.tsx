@@ -10,6 +10,7 @@ import { SocketProvider } from '@/components/providers/SocketProvider'
  * Layout for authenticated routes.
  * Server component that reads the JWT cookie, verifies it, and fetches the
  * user from the database. Redirects to /login if the session is invalid.
+ * Redirects to /pending if the user's status is not ACTIVE.
  * Passes DB-stored theme/colorMode as defaults for cross-device persistence.
  */
 export default async function AppGroupLayout({
@@ -45,8 +46,13 @@ export default async function AppGroupLayout({
     },
   })
 
-  if (!user || user.status !== UserStatus.ACTIVE) {
+  if (!user) {
     redirect('/login')
+  }
+
+  // Non-ACTIVE users are redirected to the pending page
+  if (user.status !== UserStatus.ACTIVE) {
+    redirect('/pending')
   }
 
   return (
