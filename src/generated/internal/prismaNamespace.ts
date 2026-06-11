@@ -825,6 +825,10 @@ export const WebUserScalarFieldEnum = {
   status: 'status',
   googleId: 'googleId',
   emailVerifiedAt: 'emailVerifiedAt',
+  theme: 'theme',
+  colorMode: 'colorMode',
+  storageUsedBytes: 'storageUsedBytes',
+  storageQuotaBytes: 'storageQuotaBytes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -874,7 +878,12 @@ export const TodoScalarFieldEnum = {
   title: 'title',
   description: 'description',
   status: 'status',
+  priority: 'priority',
+  completedAt: 'completedAt',
   dueDate: 'dueDate',
+  attachmentPath: 'attachmentPath',
+  attachmentName: 'attachmentName',
+  attachmentSize: 'attachmentSize',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -986,6 +995,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'BigInt'
+ */
+export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
+    
+
+
+/**
+ * Reference to a field of type 'BigInt[]'
+ */
+export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+/**
  * Reference to a field of type 'Json'
  */
 export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -1014,6 +1037,20 @@ export type ListEnumTodoStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$P
 
 
 /**
+ * Reference to a field of type 'TodoPriority'
+ */
+export type EnumTodoPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TodoPriority'>
+    
+
+
+/**
+ * Reference to a field of type 'TodoPriority[]'
+ */
+export type ListEnumTodoPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TodoPriority[]'>
+    
+
+
+/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -1024,6 +1061,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**

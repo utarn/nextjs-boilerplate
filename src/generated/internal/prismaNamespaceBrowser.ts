@@ -82,6 +82,10 @@ export const WebUserScalarFieldEnum = {
   status: 'status',
   googleId: 'googleId',
   emailVerifiedAt: 'emailVerifiedAt',
+  theme: 'theme',
+  colorMode: 'colorMode',
+  storageUsedBytes: 'storageUsedBytes',
+  storageQuotaBytes: 'storageQuotaBytes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -131,7 +135,12 @@ export const TodoScalarFieldEnum = {
   title: 'title',
   description: 'description',
   status: 'status',
+  priority: 'priority',
+  completedAt: 'completedAt',
   dueDate: 'dueDate',
+  attachmentPath: 'attachmentPath',
+  attachmentName: 'attachmentName',
+  attachmentSize: 'attachmentSize',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

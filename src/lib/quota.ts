@@ -44,11 +44,17 @@ async function getQuotaUsage(userId: string, quotaType: 'files' | 'storage' | 't
         where: { userId },
       })
     case 'files':
-      // Implement when file storage is added
-      return 0
-    case 'storage':
-      // Implement when file storage is added
-      return 0
+      return prisma.todo.count({
+        where: { userId, attachmentPath: { not: null } },
+      })
+    case 'storage': {
+      const user = await prisma.webUser.findUnique({
+        where: { id: userId },
+        select: { storageUsedBytes: true },
+      })
+      // Convert BigInt bytes to MB
+      return Number((user?.storageUsedBytes ?? BigInt(0)) / BigInt(1048576))
+    }
   }
 }
 
@@ -57,5 +63,21 @@ export async function enforceUserQuota(userId: string, quotaType: 'files' | 'sto
 
   if (!check.allowed) {
     throw new Error(`Quota exceeded: ${quotaType} limit of ${check.limit} reached`)
+  }
+}
+
+export async function getStorageUsage(userId: string): Promise<{ usedBytes: bigint; quotaBytes: bigint }> {
+  const user = await prisma.webUser.findUnique({
+    where: { id: userId },
+    select: { storageUsedBytes: true, storageQuotaBytes: true },
+  })
+
+  if (!user) {
+    return { usedBytes: BigInt(0), quotaBytes: BigInt(0) }
+  }
+
+  return {
+    usedBytes: user.storageUsedBytes,
+    quotaBytes: user.storageQuotaBytes,
   }
 }

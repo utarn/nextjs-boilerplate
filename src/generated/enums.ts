@@ -34,3 +34,13 @@ export const TodoStatus = {
 } as const
 
 export type TodoStatus = (typeof TodoStatus)[keyof typeof TodoStatus]
+
+
+export const TodoPriority = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  URGENT: 'URGENT'
+} as const
+
+export type TodoPriority = (typeof TodoPriority)[keyof typeof TodoPriority]

@@ -20,8 +20,8 @@ prisma/migrations/*
 # Testing
 coverage/
 
-# Storage
-storage/
+# Storage (data directory only, not src/lib/storage/)
+/storage/
 uploads/
 
 # Logs

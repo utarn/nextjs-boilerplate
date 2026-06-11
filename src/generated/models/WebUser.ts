@@ -20,8 +20,20 @@ export type WebUserModel = runtime.Types.Result.DefaultSelection<Prisma.$WebUser
 
 export type AggregateWebUser = {
   _count: WebUserCountAggregateOutputType | null
+  _avg: WebUserAvgAggregateOutputType | null
+  _sum: WebUserSumAggregateOutputType | null
   _min: WebUserMinAggregateOutputType | null
   _max: WebUserMaxAggregateOutputType | null
+}
+
+export type WebUserAvgAggregateOutputType = {
+  storageUsedBytes: number | null
+  storageQuotaBytes: number | null
+}
+
+export type WebUserSumAggregateOutputType = {
+  storageUsedBytes: bigint | null
+  storageQuotaBytes: bigint | null
 }
 
 export type WebUserMinAggregateOutputType = {
@@ -32,6 +44,10 @@ export type WebUserMinAggregateOutputType = {
   status: $Enums.UserStatus | null
   googleId: string | null
   emailVerifiedAt: Date | null
+  theme: string | null
+  colorMode: string | null
+  storageUsedBytes: bigint | null
+  storageQuotaBytes: bigint | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +60,10 @@ export type WebUserMaxAggregateOutputType = {
   status: $Enums.UserStatus | null
   googleId: string | null
   emailVerifiedAt: Date | null
+  theme: string | null
+  colorMode: string | null
+  storageUsedBytes: bigint | null
+  storageQuotaBytes: bigint | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,11 +76,25 @@ export type WebUserCountAggregateOutputType = {
   status: number
   googleId: number
   emailVerifiedAt: number
+  theme: number
+  colorMode: number
+  storageUsedBytes: number
+  storageQuotaBytes: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type WebUserAvgAggregateInputType = {
+  storageUsedBytes?: true
+  storageQuotaBytes?: true
+}
+
+export type WebUserSumAggregateInputType = {
+  storageUsedBytes?: true
+  storageQuotaBytes?: true
+}
 
 export type WebUserMinAggregateInputType = {
   id?: true
@@ -70,6 +104,10 @@ export type WebUserMinAggregateInputType = {
   status?: true
   googleId?: true
   emailVerifiedAt?: true
+  theme?: true
+  colorMode?: true
+  storageUsedBytes?: true
+  storageQuotaBytes?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +120,10 @@ export type WebUserMaxAggregateInputType = {
   status?: true
   googleId?: true
   emailVerifiedAt?: true
+  theme?: true
+  colorMode?: true
+  storageUsedBytes?: true
+  storageQuotaBytes?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +136,10 @@ export type WebUserCountAggregateInputType = {
   status?: true
   googleId?: true
   emailVerifiedAt?: true
+  theme?: true
+  colorMode?: true
+  storageUsedBytes?: true
+  storageQuotaBytes?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -137,6 +183,18 @@ export type WebUserAggregateArgs<ExtArgs extends runtime.Types.Extensions.Intern
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: WebUserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: WebUserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: WebUserMinAggregateInputType
@@ -167,6 +225,8 @@ export type WebUserGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   _count?: WebUserCountAggregateInputType | true
+  _avg?: WebUserAvgAggregateInputType
+  _sum?: WebUserSumAggregateInputType
   _min?: WebUserMinAggregateInputType
   _max?: WebUserMaxAggregateInputType
 }
@@ -179,9 +239,15 @@ export type WebUserGroupByOutputType = {
   status: $Enums.UserStatus
   googleId: string | null
   emailVerifiedAt: Date | null
+  theme: string | null
+  colorMode: string | null
+  storageUsedBytes: bigint
+  storageQuotaBytes: bigint
   createdAt: Date
   updatedAt: Date
   _count: WebUserCountAggregateOutputType | null
+  _avg: WebUserAvgAggregateOutputType | null
+  _sum: WebUserSumAggregateOutputType | null
   _min: WebUserMinAggregateOutputType | null
   _max: WebUserMaxAggregateOutputType | null
 }
@@ -212,6 +278,10 @@ export type WebUserWhereInput = {
   status?: Prisma.EnumUserStatusFilter<"WebUser"> | $Enums.UserStatus
   googleId?: Prisma.StringNullableFilter<"WebUser"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"WebUser"> | Date | string | null
+  theme?: Prisma.StringNullableFilter<"WebUser"> | string | null
+  colorMode?: Prisma.StringNullableFilter<"WebUser"> | string | null
+  storageUsedBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
   createdAt?: Prisma.DateTimeFilter<"WebUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"WebUser"> | Date | string
   auditLogs?: Prisma.AuditLogListRelationFilter
@@ -226,6 +296,10 @@ export type WebUserOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   googleId?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  theme?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
+  storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
@@ -243,6 +317,10 @@ export type WebUserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumWebUserRoleFilter<"WebUser"> | $Enums.WebUserRole
   status?: Prisma.EnumUserStatusFilter<"WebUser"> | $Enums.UserStatus
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"WebUser"> | Date | string | null
+  theme?: Prisma.StringNullableFilter<"WebUser"> | string | null
+  colorMode?: Prisma.StringNullableFilter<"WebUser"> | string | null
+  storageUsedBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
   createdAt?: Prisma.DateTimeFilter<"WebUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"WebUser"> | Date | string
   auditLogs?: Prisma.AuditLogListRelationFilter
@@ -257,11 +335,17 @@ export type WebUserOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   googleId?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  theme?: Prisma.SortOrderInput | Prisma.SortOrder
+  colorMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
+  storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.WebUserCountOrderByAggregateInput
+  _avg?: Prisma.WebUserAvgOrderByAggregateInput
   _max?: Prisma.WebUserMaxOrderByAggregateInput
   _min?: Prisma.WebUserMinOrderByAggregateInput
+  _sum?: Prisma.WebUserSumOrderByAggregateInput
 }
 
 export type WebUserScalarWhereWithAggregatesInput = {
@@ -275,6 +359,10 @@ export type WebUserScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"WebUser"> | $Enums.UserStatus
   googleId?: Prisma.StringNullableWithAggregatesFilter<"WebUser"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"WebUser"> | Date | string | null
+  theme?: Prisma.StringNullableWithAggregatesFilter<"WebUser"> | string | null
+  colorMode?: Prisma.StringNullableWithAggregatesFilter<"WebUser"> | string | null
+  storageUsedBytes?: Prisma.BigIntWithAggregatesFilter<"WebUser"> | bigint | number
+  storageQuotaBytes?: Prisma.BigIntWithAggregatesFilter<"WebUser"> | bigint | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"WebUser"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"WebUser"> | Date | string
 }
@@ -287,6 +375,10 @@ export type WebUserCreateInput = {
   status?: $Enums.UserStatus
   googleId?: string | null
   emailVerifiedAt?: Date | string | null
+  theme?: string | null
+  colorMode?: string | null
+  storageUsedBytes?: bigint | number
+  storageQuotaBytes?: bigint | number
   createdAt?: Date | string
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -301,6 +393,10 @@ export type WebUserUncheckedCreateInput = {
   status?: $Enums.UserStatus
   googleId?: string | null
   emailVerifiedAt?: Date | string | null
+  theme?: string | null
+  colorMode?: string | null
+  storageUsedBytes?: bigint | number
+  storageQuotaBytes?: bigint | number
   createdAt?: Date | string
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -315,6 +411,10 @@ export type WebUserUpdateInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -329,6 +429,10 @@ export type WebUserUncheckedUpdateInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -343,6 +447,10 @@ export type WebUserCreateManyInput = {
   status?: $Enums.UserStatus
   googleId?: string | null
   emailVerifiedAt?: Date | string | null
+  theme?: string | null
+  colorMode?: string | null
+  storageUsedBytes?: bigint | number
+  storageQuotaBytes?: bigint | number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -355,6 +463,10 @@ export type WebUserUpdateManyMutationInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -367,6 +479,10 @@ export type WebUserUncheckedUpdateManyInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -379,8 +495,17 @@ export type WebUserCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   googleId?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  colorMode?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
+  storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type WebUserAvgOrderByAggregateInput = {
+  storageUsedBytes?: Prisma.SortOrder
+  storageQuotaBytes?: Prisma.SortOrder
 }
 
 export type WebUserMaxOrderByAggregateInput = {
@@ -391,6 +516,10 @@ export type WebUserMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   googleId?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  colorMode?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
+  storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -403,8 +532,17 @@ export type WebUserMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   googleId?: Prisma.SortOrder
   emailVerifiedAt?: Prisma.SortOrder
+  theme?: Prisma.SortOrder
+  colorMode?: Prisma.SortOrder
+  storageUsedBytes?: Prisma.SortOrder
+  storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type WebUserSumOrderByAggregateInput = {
+  storageUsedBytes?: Prisma.SortOrder
+  storageQuotaBytes?: Prisma.SortOrder
 }
 
 export type WebUserNullableScalarRelationFilter = {
@@ -435,6 +573,14 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type BigIntFieldUpdateOperationsInput = {
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -479,6 +625,10 @@ export type WebUserCreateWithoutAuditLogsInput = {
   status?: $Enums.UserStatus
   googleId?: string | null
   emailVerifiedAt?: Date | string | null
+  theme?: string | null
+  colorMode?: string | null
+  storageUsedBytes?: bigint | number
+  storageQuotaBytes?: bigint | number
   createdAt?: Date | string
   updatedAt?: Date | string
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
@@ -492,6 +642,10 @@ export type WebUserUncheckedCreateWithoutAuditLogsInput = {
   status?: $Enums.UserStatus
   googleId?: string | null
   emailVerifiedAt?: Date | string | null
+  theme?: string | null
+  colorMode?: string | null
+  storageUsedBytes?: bigint | number
+  storageQuotaBytes?: bigint | number
   createdAt?: Date | string
   updatedAt?: Date | string
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
@@ -521,6 +675,10 @@ export type WebUserUpdateWithoutAuditLogsInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
@@ -534,6 +692,10 @@ export type WebUserUncheckedUpdateWithoutAuditLogsInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
@@ -547,6 +709,10 @@ export type WebUserCreateWithoutTodosInput = {
   status?: $Enums.UserStatus
   googleId?: string | null
   emailVerifiedAt?: Date | string | null
+  theme?: string | null
+  colorMode?: string | null
+  storageUsedBytes?: bigint | number
+  storageQuotaBytes?: bigint | number
   createdAt?: Date | string
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
@@ -560,6 +726,10 @@ export type WebUserUncheckedCreateWithoutTodosInput = {
   status?: $Enums.UserStatus
   googleId?: string | null
   emailVerifiedAt?: Date | string | null
+  theme?: string | null
+  colorMode?: string | null
+  storageUsedBytes?: bigint | number
+  storageQuotaBytes?: bigint | number
   createdAt?: Date | string
   updatedAt?: Date | string
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -589,6 +759,10 @@ export type WebUserUpdateWithoutTodosInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
@@ -602,6 +776,10 @@ export type WebUserUncheckedUpdateWithoutTodosInput = {
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -655,6 +833,10 @@ export type WebUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   status?: boolean
   googleId?: boolean
   emailVerifiedAt?: boolean
+  theme?: boolean
+  colorMode?: boolean
+  storageUsedBytes?: boolean
+  storageQuotaBytes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   auditLogs?: boolean | Prisma.WebUser$auditLogsArgs<ExtArgs>
@@ -670,6 +852,10 @@ export type WebUserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   googleId?: boolean
   emailVerifiedAt?: boolean
+  theme?: boolean
+  colorMode?: boolean
+  storageUsedBytes?: boolean
+  storageQuotaBytes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["webUser"]>
@@ -682,6 +868,10 @@ export type WebUserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   googleId?: boolean
   emailVerifiedAt?: boolean
+  theme?: boolean
+  colorMode?: boolean
+  storageUsedBytes?: boolean
+  storageQuotaBytes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["webUser"]>
@@ -694,11 +884,15 @@ export type WebUserSelectScalar = {
   status?: boolean
   googleId?: boolean
   emailVerifiedAt?: boolean
+  theme?: boolean
+  colorMode?: boolean
+  storageUsedBytes?: boolean
+  storageQuotaBytes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type WebUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "displayName" | "role" | "status" | "googleId" | "emailVerifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["webUser"]>
+export type WebUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "displayName" | "role" | "status" | "googleId" | "emailVerifiedAt" | "theme" | "colorMode" | "storageUsedBytes" | "storageQuotaBytes" | "createdAt" | "updatedAt", ExtArgs["result"]["webUser"]>
 export type WebUserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auditLogs?: boolean | Prisma.WebUser$auditLogsArgs<ExtArgs>
   todos?: boolean | Prisma.WebUser$todosArgs<ExtArgs>
@@ -721,6 +915,10 @@ export type $WebUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     status: $Enums.UserStatus
     googleId: string | null
     emailVerifiedAt: Date | null
+    theme: string | null
+    colorMode: string | null
+    storageUsedBytes: bigint
+    storageQuotaBytes: bigint
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["webUser"]>
@@ -1155,6 +1353,10 @@ export interface WebUserFieldRefs {
   readonly status: Prisma.FieldRef<"WebUser", 'UserStatus'>
   readonly googleId: Prisma.FieldRef<"WebUser", 'String'>
   readonly emailVerifiedAt: Prisma.FieldRef<"WebUser", 'DateTime'>
+  readonly theme: Prisma.FieldRef<"WebUser", 'String'>
+  readonly colorMode: Prisma.FieldRef<"WebUser", 'String'>
+  readonly storageUsedBytes: Prisma.FieldRef<"WebUser", 'BigInt'>
+  readonly storageQuotaBytes: Prisma.FieldRef<"WebUser", 'BigInt'>
   readonly createdAt: Prisma.FieldRef<"WebUser", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"WebUser", 'DateTime'>
 }

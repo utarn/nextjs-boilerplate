@@ -20,8 +20,18 @@ export type TodoModel = runtime.Types.Result.DefaultSelection<Prisma.$TodoPayloa
 
 export type AggregateTodo = {
   _count: TodoCountAggregateOutputType | null
+  _avg: TodoAvgAggregateOutputType | null
+  _sum: TodoSumAggregateOutputType | null
   _min: TodoMinAggregateOutputType | null
   _max: TodoMaxAggregateOutputType | null
+}
+
+export type TodoAvgAggregateOutputType = {
+  attachmentSize: number | null
+}
+
+export type TodoSumAggregateOutputType = {
+  attachmentSize: bigint | null
 }
 
 export type TodoMinAggregateOutputType = {
@@ -30,7 +40,12 @@ export type TodoMinAggregateOutputType = {
   title: string | null
   description: string | null
   status: $Enums.TodoStatus | null
+  priority: $Enums.TodoPriority | null
+  completedAt: Date | null
   dueDate: Date | null
+  attachmentPath: string | null
+  attachmentName: string | null
+  attachmentSize: bigint | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -41,7 +56,12 @@ export type TodoMaxAggregateOutputType = {
   title: string | null
   description: string | null
   status: $Enums.TodoStatus | null
+  priority: $Enums.TodoPriority | null
+  completedAt: Date | null
   dueDate: Date | null
+  attachmentPath: string | null
+  attachmentName: string | null
+  attachmentSize: bigint | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,12 +72,25 @@ export type TodoCountAggregateOutputType = {
   title: number
   description: number
   status: number
+  priority: number
+  completedAt: number
   dueDate: number
+  attachmentPath: number
+  attachmentName: number
+  attachmentSize: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
+
+export type TodoAvgAggregateInputType = {
+  attachmentSize?: true
+}
+
+export type TodoSumAggregateInputType = {
+  attachmentSize?: true
+}
 
 export type TodoMinAggregateInputType = {
   id?: true
@@ -65,7 +98,12 @@ export type TodoMinAggregateInputType = {
   title?: true
   description?: true
   status?: true
+  priority?: true
+  completedAt?: true
   dueDate?: true
+  attachmentPath?: true
+  attachmentName?: true
+  attachmentSize?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -76,7 +114,12 @@ export type TodoMaxAggregateInputType = {
   title?: true
   description?: true
   status?: true
+  priority?: true
+  completedAt?: true
   dueDate?: true
+  attachmentPath?: true
+  attachmentName?: true
+  attachmentSize?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -87,7 +130,12 @@ export type TodoCountAggregateInputType = {
   title?: true
   description?: true
   status?: true
+  priority?: true
+  completedAt?: true
   dueDate?: true
+  attachmentPath?: true
+  attachmentName?: true
+  attachmentSize?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -131,6 +179,18 @@ export type TodoAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: TodoAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: TodoSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: TodoMinAggregateInputType
@@ -161,6 +221,8 @@ export type TodoGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: TodoCountAggregateInputType | true
+  _avg?: TodoAvgAggregateInputType
+  _sum?: TodoSumAggregateInputType
   _min?: TodoMinAggregateInputType
   _max?: TodoMaxAggregateInputType
 }
@@ -171,10 +233,17 @@ export type TodoGroupByOutputType = {
   title: string
   description: string | null
   status: $Enums.TodoStatus
+  priority: $Enums.TodoPriority
+  completedAt: Date | null
   dueDate: Date | null
+  attachmentPath: string | null
+  attachmentName: string | null
+  attachmentSize: bigint | null
   createdAt: Date
   updatedAt: Date
   _count: TodoCountAggregateOutputType | null
+  _avg: TodoAvgAggregateOutputType | null
+  _sum: TodoSumAggregateOutputType | null
   _min: TodoMinAggregateOutputType | null
   _max: TodoMaxAggregateOutputType | null
 }
@@ -203,7 +272,12 @@ export type TodoWhereInput = {
   title?: Prisma.StringFilter<"Todo"> | string
   description?: Prisma.StringNullableFilter<"Todo"> | string | null
   status?: Prisma.EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFilter<"Todo"> | $Enums.TodoPriority
+  completedAt?: Prisma.DateTimeNullableFilter<"Todo"> | Date | string | null
   dueDate?: Prisma.DateTimeNullableFilter<"Todo"> | Date | string | null
+  attachmentPath?: Prisma.StringNullableFilter<"Todo"> | string | null
+  attachmentName?: Prisma.StringNullableFilter<"Todo"> | string | null
+  attachmentSize?: Prisma.BigIntNullableFilter<"Todo"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
   user?: Prisma.XOR<Prisma.WebUserScalarRelationFilter, Prisma.WebUserWhereInput>
@@ -215,7 +289,12 @@ export type TodoOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentPath?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentName?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentSize?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.WebUserOrderByWithRelationInput
@@ -230,7 +309,12 @@ export type TodoWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Todo"> | string
   description?: Prisma.StringNullableFilter<"Todo"> | string | null
   status?: Prisma.EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFilter<"Todo"> | $Enums.TodoPriority
+  completedAt?: Prisma.DateTimeNullableFilter<"Todo"> | Date | string | null
   dueDate?: Prisma.DateTimeNullableFilter<"Todo"> | Date | string | null
+  attachmentPath?: Prisma.StringNullableFilter<"Todo"> | string | null
+  attachmentName?: Prisma.StringNullableFilter<"Todo"> | string | null
+  attachmentSize?: Prisma.BigIntNullableFilter<"Todo"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
   user?: Prisma.XOR<Prisma.WebUserScalarRelationFilter, Prisma.WebUserWhereInput>
@@ -242,12 +326,19 @@ export type TodoOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentPath?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentName?: Prisma.SortOrderInput | Prisma.SortOrder
+  attachmentSize?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.TodoCountOrderByAggregateInput
+  _avg?: Prisma.TodoAvgOrderByAggregateInput
   _max?: Prisma.TodoMaxOrderByAggregateInput
   _min?: Prisma.TodoMinOrderByAggregateInput
+  _sum?: Prisma.TodoSumOrderByAggregateInput
 }
 
 export type TodoScalarWhereWithAggregatesInput = {
@@ -259,7 +350,12 @@ export type TodoScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Todo"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Todo"> | string | null
   status?: Prisma.EnumTodoStatusWithAggregatesFilter<"Todo"> | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityWithAggregatesFilter<"Todo"> | $Enums.TodoPriority
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Todo"> | Date | string | null
   dueDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Todo"> | Date | string | null
+  attachmentPath?: Prisma.StringNullableWithAggregatesFilter<"Todo"> | string | null
+  attachmentName?: Prisma.StringNullableWithAggregatesFilter<"Todo"> | string | null
+  attachmentSize?: Prisma.BigIntNullableWithAggregatesFilter<"Todo"> | bigint | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Todo"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Todo"> | Date | string
 }
@@ -269,7 +365,12 @@ export type TodoCreateInput = {
   title: string
   description?: string | null
   status?: $Enums.TodoStatus
+  priority?: $Enums.TodoPriority
+  completedAt?: Date | string | null
   dueDate?: Date | string | null
+  attachmentPath?: string | null
+  attachmentName?: string | null
+  attachmentSize?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.WebUserCreateNestedOneWithoutTodosInput
@@ -281,7 +382,12 @@ export type TodoUncheckedCreateInput = {
   title: string
   description?: string | null
   status?: $Enums.TodoStatus
+  priority?: $Enums.TodoPriority
+  completedAt?: Date | string | null
   dueDate?: Date | string | null
+  attachmentPath?: string | null
+  attachmentName?: string | null
+  attachmentSize?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -291,7 +397,12 @@ export type TodoUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFieldUpdateOperationsInput | $Enums.TodoPriority
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  attachmentPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentSize?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.WebUserUpdateOneRequiredWithoutTodosNestedInput
@@ -303,7 +414,12 @@ export type TodoUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFieldUpdateOperationsInput | $Enums.TodoPriority
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  attachmentPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentSize?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -314,7 +430,12 @@ export type TodoCreateManyInput = {
   title: string
   description?: string | null
   status?: $Enums.TodoStatus
+  priority?: $Enums.TodoPriority
+  completedAt?: Date | string | null
   dueDate?: Date | string | null
+  attachmentPath?: string | null
+  attachmentName?: string | null
+  attachmentSize?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -324,7 +445,12 @@ export type TodoUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFieldUpdateOperationsInput | $Enums.TodoPriority
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  attachmentPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentSize?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -335,7 +461,12 @@ export type TodoUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFieldUpdateOperationsInput | $Enums.TodoPriority
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  attachmentPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentSize?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -356,9 +487,18 @@ export type TodoCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
+  attachmentPath?: Prisma.SortOrder
+  attachmentName?: Prisma.SortOrder
+  attachmentSize?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type TodoAvgOrderByAggregateInput = {
+  attachmentSize?: Prisma.SortOrder
 }
 
 export type TodoMaxOrderByAggregateInput = {
@@ -367,7 +507,12 @@ export type TodoMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
+  attachmentPath?: Prisma.SortOrder
+  attachmentName?: Prisma.SortOrder
+  attachmentSize?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -378,9 +523,18 @@ export type TodoMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  priority?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
+  attachmentPath?: Prisma.SortOrder
+  attachmentName?: Prisma.SortOrder
+  attachmentSize?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type TodoSumOrderByAggregateInput = {
+  attachmentSize?: Prisma.SortOrder
 }
 
 export type TodoCreateNestedManyWithoutUserInput = {
@@ -429,12 +583,29 @@ export type EnumTodoStatusFieldUpdateOperationsInput = {
   set?: $Enums.TodoStatus
 }
 
+export type EnumTodoPriorityFieldUpdateOperationsInput = {
+  set?: $Enums.TodoPriority
+}
+
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
 export type TodoCreateWithoutUserInput = {
   id?: string
   title: string
   description?: string | null
   status?: $Enums.TodoStatus
+  priority?: $Enums.TodoPriority
+  completedAt?: Date | string | null
   dueDate?: Date | string | null
+  attachmentPath?: string | null
+  attachmentName?: string | null
+  attachmentSize?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -444,7 +615,12 @@ export type TodoUncheckedCreateWithoutUserInput = {
   title: string
   description?: string | null
   status?: $Enums.TodoStatus
+  priority?: $Enums.TodoPriority
+  completedAt?: Date | string | null
   dueDate?: Date | string | null
+  attachmentPath?: string | null
+  attachmentName?: string | null
+  attachmentSize?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -484,7 +660,12 @@ export type TodoScalarWhereInput = {
   title?: Prisma.StringFilter<"Todo"> | string
   description?: Prisma.StringNullableFilter<"Todo"> | string | null
   status?: Prisma.EnumTodoStatusFilter<"Todo"> | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFilter<"Todo"> | $Enums.TodoPriority
+  completedAt?: Prisma.DateTimeNullableFilter<"Todo"> | Date | string | null
   dueDate?: Prisma.DateTimeNullableFilter<"Todo"> | Date | string | null
+  attachmentPath?: Prisma.StringNullableFilter<"Todo"> | string | null
+  attachmentName?: Prisma.StringNullableFilter<"Todo"> | string | null
+  attachmentSize?: Prisma.BigIntNullableFilter<"Todo"> | bigint | number | null
   createdAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Todo"> | Date | string
 }
@@ -494,7 +675,12 @@ export type TodoCreateManyUserInput = {
   title: string
   description?: string | null
   status?: $Enums.TodoStatus
+  priority?: $Enums.TodoPriority
+  completedAt?: Date | string | null
   dueDate?: Date | string | null
+  attachmentPath?: string | null
+  attachmentName?: string | null
+  attachmentSize?: bigint | number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -504,7 +690,12 @@ export type TodoUpdateWithoutUserInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFieldUpdateOperationsInput | $Enums.TodoPriority
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  attachmentPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentSize?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -514,7 +705,12 @@ export type TodoUncheckedUpdateWithoutUserInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFieldUpdateOperationsInput | $Enums.TodoPriority
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  attachmentPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentSize?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -524,7 +720,12 @@ export type TodoUncheckedUpdateManyWithoutUserInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumTodoStatusFieldUpdateOperationsInput | $Enums.TodoStatus
+  priority?: Prisma.EnumTodoPriorityFieldUpdateOperationsInput | $Enums.TodoPriority
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  attachmentPath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  attachmentSize?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -537,7 +738,12 @@ export type TodoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   title?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  completedAt?: boolean
   dueDate?: boolean
+  attachmentPath?: boolean
+  attachmentName?: boolean
+  attachmentSize?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.WebUserDefaultArgs<ExtArgs>
@@ -549,7 +755,12 @@ export type TodoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   title?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  completedAt?: boolean
   dueDate?: boolean
+  attachmentPath?: boolean
+  attachmentName?: boolean
+  attachmentSize?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.WebUserDefaultArgs<ExtArgs>
@@ -561,7 +772,12 @@ export type TodoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   title?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  completedAt?: boolean
   dueDate?: boolean
+  attachmentPath?: boolean
+  attachmentName?: boolean
+  attachmentSize?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.WebUserDefaultArgs<ExtArgs>
@@ -573,12 +789,17 @@ export type TodoSelectScalar = {
   title?: boolean
   description?: boolean
   status?: boolean
+  priority?: boolean
+  completedAt?: boolean
   dueDate?: boolean
+  attachmentPath?: boolean
+  attachmentName?: boolean
+  attachmentSize?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TodoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "status" | "dueDate" | "createdAt" | "updatedAt", ExtArgs["result"]["todo"]>
+export type TodoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "status" | "priority" | "completedAt" | "dueDate" | "attachmentPath" | "attachmentName" | "attachmentSize" | "createdAt" | "updatedAt", ExtArgs["result"]["todo"]>
 export type TodoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.WebUserDefaultArgs<ExtArgs>
 }
@@ -600,7 +821,12 @@ export type $TodoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     title: string
     description: string | null
     status: $Enums.TodoStatus
+    priority: $Enums.TodoPriority
+    completedAt: Date | null
     dueDate: Date | null
+    attachmentPath: string | null
+    attachmentName: string | null
+    attachmentSize: bigint | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["todo"]>
@@ -1032,7 +1258,12 @@ export interface TodoFieldRefs {
   readonly title: Prisma.FieldRef<"Todo", 'String'>
   readonly description: Prisma.FieldRef<"Todo", 'String'>
   readonly status: Prisma.FieldRef<"Todo", 'TodoStatus'>
+  readonly priority: Prisma.FieldRef<"Todo", 'TodoPriority'>
+  readonly completedAt: Prisma.FieldRef<"Todo", 'DateTime'>
   readonly dueDate: Prisma.FieldRef<"Todo", 'DateTime'>
+  readonly attachmentPath: Prisma.FieldRef<"Todo", 'String'>
+  readonly attachmentName: Prisma.FieldRef<"Todo", 'String'>
+  readonly attachmentSize: Prisma.FieldRef<"Todo", 'BigInt'>
   readonly createdAt: Prisma.FieldRef<"Todo", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Todo", 'DateTime'>
 }

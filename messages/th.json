@@ -55,7 +55,9 @@
   },
   "todos": {
     "title": "รายการที่ต้องทำของฉัน",
+    "all": "ทั้งหมด",
     "addTodo": "เพิ่มรายการ",
+    "editTodo": "แก้ไขรายการ",
     "noTodos": "ยังไม่มีรายการ สร้างรายการใหม่เพื่อเริ่มต้น!",
     "pending": "รอดำเนินการ",
     "inProgress": "กำลังดำเนินการ",
@@ -64,7 +66,21 @@
     "titlePlaceholder": "ชื่อรายการ",
     "descriptionPlaceholder": "คำอธิบาย (ไม่จำเป็น)",
     "dueDate": "วันครบกำหนด",
-    "status": "สถานะ"
+    "completedAt": "เสร็จเมื่อ",
+    "status": "สถานะ",
+    "priority": "ลำดับความสำคัญ",
+    "priorityLow": "ต่ำ",
+    "priorityMedium": "ปานกลาง",
+    "priorityHigh": "สูง",
+    "priorityUrgent": "เร่งด่วน",
+    "attachment": "ไฟล์แนบ",
+    "currentAttachment": "ไฟล์แนบปัจจุบัน",
+    "removeAttachment": "ลบ",
+    "replaceAttachment": "เปลี่ยนไฟล์แนบ",
+    "errorTitleRequired": "กรุณากรอกชื่อรายการ",
+    "errorStorageQuota": "พื้นที่จัดเก็บเต็ม โปรดเพิ่มพื้นที่ว่าง",
+    "errorCreateFailed": "ไม่สามารถสร้างรายการได้",
+    "errorUpdateFailed": "ไม่สามารถอัปเดตรายการได้"
   },
   "Dashboard": {
     "title": "แดชบอร์ด",
