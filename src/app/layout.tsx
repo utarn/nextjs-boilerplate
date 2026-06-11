@@ -4,6 +4,7 @@ import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { ThemeScript } from '@/components/providers/ThemeScript'
 import './globals.css'
+import './themes.css'
 
 const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Next.js Boilerplate'
 
