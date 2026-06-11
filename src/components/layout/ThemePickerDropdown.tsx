@@ -11,7 +11,7 @@ import {
 import { useTheme } from '@/components/providers/ThemeProvider'
 
 export function ThemePickerDropdown() {
-  const { theme, setTheme } = useTheme()
+  const { colorMode, setColorMode } = useTheme()
 
   return (
     <DropdownMenu>
@@ -23,15 +23,15 @@ export function ThemePickerDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')} className={theme === 'light' ? 'bg-accent' : ''}>
+        <DropdownMenuItem onClick={() => setColorMode('light')} className={colorMode === 'light' ? 'bg-accent' : ''}>
           <Sun className="h-4 w-4 mr-2" />
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')} className={theme === 'dark' ? 'bg-accent' : ''}>
+        <DropdownMenuItem onClick={() => setColorMode('dark')} className={colorMode === 'dark' ? 'bg-accent' : ''}>
           <Moon className="h-4 w-4 mr-2" />
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')} className={theme === 'system' ? 'bg-accent' : ''}>
+        <DropdownMenuItem onClick={() => setColorMode('system')} className={colorMode === 'system' ? 'bg-accent' : ''}>
           <Monitor className="h-4 w-4 mr-2" />
           System
         </DropdownMenuItem>
