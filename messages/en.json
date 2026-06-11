@@ -55,7 +55,9 @@
   },
   "todos": {
     "title": "My Todos",
+    "all": "All",
     "addTodo": "Add Todo",
+    "editTodo": "Edit Todo",
     "noTodos": "No todos yet. Create one to get started!",
     "pending": "Pending",
     "inProgress": "In Progress",
@@ -64,7 +66,21 @@
     "titlePlaceholder": "Todo title",
     "descriptionPlaceholder": "Description (optional)",
     "dueDate": "Due Date",
-    "status": "Status"
+    "completedAt": "Completed",
+    "status": "Status",
+    "priority": "Priority",
+    "priorityLow": "Low",
+    "priorityMedium": "Medium",
+    "priorityHigh": "High",
+    "priorityUrgent": "Urgent",
+    "attachment": "Attachment",
+    "currentAttachment": "Current Attachment",
+    "removeAttachment": "Remove",
+    "replaceAttachment": "Replace Attachment",
+    "errorTitleRequired": "Title is required",
+    "errorStorageQuota": "Storage quota exceeded. Please free up space.",
+    "errorCreateFailed": "Failed to create todo",
+    "errorUpdateFailed": "Failed to update todo"
   },
   "Dashboard": {
     "title": "Dashboard",
