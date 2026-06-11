@@ -3,6 +3,7 @@ import { exchangeCodeForTokens, getUserInfo } from '@/lib/google-oauth'
 import { createAuthSession, appUrl } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { UserStatus, WebUserRole } from '@/generated/client'
+import { logAuditEvent, AUDIT_ACTIONS } from '@/lib/audit'
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,9 +30,23 @@ export async function GET(request: NextRequest) {
           email: userInfo.email,
           displayName: userInfo.name,
           googleId: userInfo.sub,
-          status: UserStatus.ACTIVE,
+          status: UserStatus.PENDING,
           role: WebUserRole.USER,
           emailVerifiedAt: new Date(),
+        },
+      })
+
+      // Audit log user creation
+      await logAuditEvent({
+        userId: user.id,
+        action: AUDIT_ACTIONS.USER_CREATED,
+        entityType: 'webUser',
+        entityId: user.id,
+        details: {
+          email: user.email,
+          displayName: user.displayName,
+          method: 'google_oauth',
+          status: UserStatus.PENDING,
         },
       })
     } else if (!user.googleId) {

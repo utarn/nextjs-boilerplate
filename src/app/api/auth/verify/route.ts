@@ -3,6 +3,7 @@ import { verifyMagicLink } from '@/lib/magic-link'
 import { createAuthSession, appUrl } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { UserStatus, WebUserRole } from '@/generated/client'
+import { logAuditEvent, AUDIT_ACTIONS } from '@/lib/audit'
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,8 +28,22 @@ export async function GET(request: NextRequest) {
         data: {
           email: result.email,
           displayName: result.email.split('@')[0],
-          status: UserStatus.ACTIVE,
+          status: UserStatus.PENDING,
           role: WebUserRole.USER,
+        },
+      })
+
+      // Audit log user creation
+      await logAuditEvent({
+        userId: user.id,
+        action: AUDIT_ACTIONS.USER_CREATED,
+        entityType: 'webUser',
+        entityId: user.id,
+        details: {
+          email: user.email,
+          displayName: user.displayName,
+          method: 'magic_link',
+          status: UserStatus.PENDING,
         },
       })
     }
