@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Menu, CheckSquare, User, Settings, LogOut, LayoutDashboard } from 'lucide-react'
+import { Menu, CheckSquare, User, Settings, LogOut, LayoutDashboard, Users, ListOrdered, ScrollText, Activity } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
@@ -36,9 +36,14 @@ export function AppLayout({ children, user, defaultTheme, defaultColorMode }: Ap
     { href: '/settings', label: t('settings'), icon: Settings },
   ]
 
-  // Admin-only link
+  // Admin-only links
   if (user.role === 'ADMIN') {
-    navItems.push({ href: '/admin/queues', label: t('admin'), icon: LayoutDashboard })
+    navItems.push(
+      { href: '/admin/users', label: 'Users', icon: Users },
+      { href: '/admin/queues', label: 'Queues', icon: ListOrdered },
+      { href: '/admin/audit-log', label: 'Audit Log', icon: ScrollText },
+      { href: '/admin/system', label: 'System', icon: Activity },
+    )
   }
 
   const isActive = (href: string) => pathname?.startsWith(href)
