@@ -166,7 +166,7 @@ vi.mock('@/lib/email', () => ({
 import { prisma } from '@/lib/prisma'
 import { eventBus } from '@/lib/event-bus'
 import { logAuditEvent } from '@/lib/audit'
-import { enforceUserQuota, checkUserQuota, getStorageUsage } from '@/lib/quota'
+import { enforceUserQuota, checkUserQuota } from '@/lib/quota'
 import { getStorageAdapter } from '@/lib/storage'
 import { todoProcessingQueue } from '@/lib/queue'
 

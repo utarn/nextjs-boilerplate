@@ -58,11 +58,6 @@ function getAppUrl(): string {
 // Branded email HTML wrapper
 // ---------------------------------------------------------------------------
 
-interface EmailContent {
-  html: string
-  text: string
-}
-
 /**
  * Wrap body HTML in a branded email template with consistent header, spacing,
  * and footer.  The wrapper is fully responsive with inline styles for maximum

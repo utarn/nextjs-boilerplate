@@ -116,6 +116,27 @@ interface ThemeProviderProps {
   defaultColorMode?: ColorMode;
 }
 
+/**
+ * Theme context provider that manages the active theme preset and color mode.
+ *
+ * - Initialises from server-passed props (for SSR match) or localStorage.
+ * - Applies `data-theme` attribute and `.dark` class on `<html>`.
+ * - Listens for system `prefers-color-scheme` changes in "system" mode.
+ * - Persists preferences to localStorage and optionally to the server DB.
+ *
+ * @example
+ * ```tsx
+ * // In root layout.tsx
+ * <ThemeProvider>
+ *   {children}
+ * </ThemeProvider>
+ *
+ * // With server-side preferences (from DB)
+ * <ThemeProvider defaultTheme={user.theme} defaultColorMode={user.colorMode}>
+ *   {children}
+ * </ThemeProvider>
+ * ```
+ */
 export function ThemeProvider({
   children,
   defaultTheme,
@@ -145,6 +166,7 @@ export function ThemeProvider({
       | null;
 
     if (!defaultTheme && storedTheme) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setThemeState(storedTheme);
     }
     if (!defaultColorMode && storedColorMode) {
@@ -157,6 +179,7 @@ export function ThemeProvider({
   // ----- Side-effect: apply to DOM whenever theme / colorMode changes ---------
   useEffect(() => {
     const dark = resolveIsDark(colorMode);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDark(dark);
     applyThemeToDocument(theme, dark);
   }, [theme, colorMode]);
@@ -208,6 +231,33 @@ export function ThemeProvider({
 // Hook
 // ---------------------------------------------------------------------------
 
+/**
+ * Access the current theme context values.
+ * Must be called within a `<ThemeProvider>`.
+ *
+ * @example
+ * ```tsx
+ * 'use client'
+ * import { useTheme } from '@/components/providers/ThemeProvider'
+ *
+ * function ThemeSwitcher() {
+ *   const { theme, colorMode, isDark, setTheme, setColorMode } = useTheme()
+ *
+ *   return (
+ *     <div>
+ *       <p>Current theme: {theme}</p>
+ *       <p>Dark mode: {isDark ? 'Yes' : 'No'}</p>
+ *       <button onClick={() => setTheme('catppuccin', true)}>
+ *         Switch to Catppuccin
+ *       </button>
+ *       <button onClick={() => setColorMode('dark', true)}>
+ *         Dark Mode
+ *       </button>
+ *     </div>
+ *   )
+ * }
+ * ```
+ */
 export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) {

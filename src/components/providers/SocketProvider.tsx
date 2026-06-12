@@ -67,6 +67,16 @@ interface SocketProviderProps {
  * - Disconnects on unmount.
  * - Persists across client-side soft navigations because it wraps the
  *   `(app)` layout, not individual pages.
+ *
+ * @example
+ * ```tsx
+ * // Wrap authenticated pages with the provider
+ * <SocketProvider>
+ *   <AppLayout>
+ *     {children}
+ *   </AppLayout>
+ * </SocketProvider>
+ * ```
  */
 export function SocketProvider({ children }: SocketProviderProps) {
   const [socketState, setSocketState] = useState<Socket | null>(null)
@@ -75,6 +85,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   useEffect(() => {
     const socket = io(SOCKET_OPTIONS)
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSocketState(socket)
 
     socket.on('connect', () => {
@@ -127,11 +138,11 @@ export function useSocketEvent<T = unknown>(
 ): void {
   const { socket } = useContext(SocketContext)
   const callbackRef = useRef(callback)
-  callbackRef.current = callback
-
+  useEffect(() => {
+    callbackRef.current = callback
+  })
   // Use a stable wrapper so the socket listener doesn't need to be
   // re-registered every time the consumer's callback reference changes.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const stableCallback = useCallback((data: T) => {
     callbackRef.current(data)
   }, [])
@@ -154,6 +165,14 @@ export function useSocketEvent<T = unknown>(
 /**
  * Returns whether the socket managed by the nearest `SocketProvider` is
  * currently connected.
+ *
+ * @example
+ * ```tsx
+ * function LiveStatus() {
+ *   const connected = useSocketConnected()
+ *   return <span>{connected ? 'Live' : 'Offline'}</span>
+ * }
+ * ```
  */
 export function useSocketConnected(): boolean {
   const { status } = useContext(SocketContext)

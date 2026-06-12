@@ -11,7 +11,6 @@ import {
   XCircle,
   Paperclip,
   Pencil,
-  Upload,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -116,6 +115,7 @@ export function TodosPageClient() {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchTodos()
   }, [fetchTodos])
 

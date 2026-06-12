@@ -30,7 +30,8 @@ export function ValuePropsSection() {
     <section id="valueProps" className="bg-white px-4 py-14 sm:px-6 sm:py-20 lg:py-28">
       <div className="mx-auto max-w-6xl">
         {/* Section header */}
-        <div ref={headerAnim.ref} className="mb-10 sm:mb-16">
+        <div // eslint-disable-next-line react-hooks/refs
+          ref={headerAnim.ref} className="mb-10 sm:mb-16">
           <h2 className="text-center font-prompt text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
             {t('title')}
           </h2>

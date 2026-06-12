@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -65,7 +65,8 @@ export default function AuditLogPage() {
   }, [page, actionFilter, actorFilter, dateFrom, dateTo, t])
 
   useEffect(() => {
-    fetchLogs()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchLogs()
   }, [fetchLogs])
 
   const handleFilter = () => {

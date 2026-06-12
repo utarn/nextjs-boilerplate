@@ -60,6 +60,18 @@ async function publish(channel: string, payload: unknown): Promise<void> {
 export const eventBus = {
   /**
    * Broadcast that a todo was created.
+   *
+   * @example
+   * ```ts
+   * // After creating a todo in an API route
+   * import { eventBus } from '@/lib/event-bus'
+   *
+   * await eventBus.todoCreated({
+   *   userId: 'user-123',
+   *   todoId: 'todo-456',
+   *   title: 'Finish documentation',
+   * })
+   * ```
    */
   async todoCreated(data: import('./channel-types').TodoCreatedPayload): Promise<void> {
     await publish(CHANNEL_TODO_CREATED, data)
@@ -81,6 +93,21 @@ export const eventBus = {
 
   /**
    * Broadcast updated dashboard stats for a user.
+   *
+   * @example
+   * ```ts
+   * // After computing dashboard metrics (e.g. in a worker)
+   * import { eventBus } from '@/lib/event-bus'
+   *
+   * await eventBus.dashboardStats({
+   *   userId: 'user-123',
+   *   total: 25,
+   *   pending: 10,
+   *   inProgress: 5,
+   *   completed: 8,
+   *   cancelled: 2,
+   * })
+   * ```
    */
   async dashboardStats(data: import('./channel-types').DashboardStatsPayload): Promise<void> {
     await publish(CHANNEL_DASHBOARD_STATS, data)

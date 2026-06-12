@@ -130,7 +130,7 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
       socket.data.user = payload
 
       next()
-    } catch (err) {
+    } catch {
       next(new Error('Authentication failed'))
     }
   })

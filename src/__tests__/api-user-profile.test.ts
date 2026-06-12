@@ -83,7 +83,6 @@ vi.mock('@/lib/theme-catalog', () => ({
 // Imports (after mocks)
 // ---------------------------------------------------------------------------
 import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth'
 
 // ---------------------------------------------------------------------------
 // Tests

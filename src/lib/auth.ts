@@ -174,6 +174,23 @@ async function requireAuth(request: NextRequest): Promise<JWTPayload | null> {
  * Extract the authenticated user from the request and pass it to the handler.
  * Throws `AuthenticationError` when no valid session is found or the user's
  * status is not ACTIVE.
+ *
+ * @example
+ * ```ts
+ * // Require authentication in an API route
+ * export async function GET(request: NextRequest) {
+ *   try {
+ *     return await withAuth(request, async (user) => {
+ *       const todos = await prisma.todo.findMany({
+ *         where: { userId: user.userId },
+ *       })
+ *       return NextResponse.json(todos)
+ *     })
+ *   } catch (err) {
+ *     return handleRouteError(err)
+ *   }
+ * }
+ * ```
  */
 export async function withAuth<T>(
   request: NextRequest,
@@ -200,6 +217,21 @@ export async function withAuth<T>(
 /**
  * Like `withAuth`, but also enforces that the user holds one of the given roles.
  * Throws `AuthorizationError` when the role does not match.
+ *
+ * @example
+ * ```ts
+ * // Require ADMIN role in an API route
+ * export async function DELETE(request: NextRequest) {
+ *   try {
+ *     return await withRoles(request, [WebUserRole.ADMIN], async (user) => {
+ *       // admin-only deletion logic
+ *       return NextResponse.json({ success: true })
+ *     })
+ *   } catch (err) {
+ *     return handleRouteError(err)
+ *   }
+ * }
+ * ```
  */
 export async function withRoles<T>(
   request: NextRequest,
