@@ -1,6 +1,10 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Next.js Production Boilerplate
 
-A production-ready Next.js boilerplate template designed for AI agents to learn from and use as a starting point for new projects.
+A production-ready Next.js boilerplate designed as a reference for spinning up new projects. The repo is a *template* — understand what it wires together before you change anything.
 
 ## Stack
 
@@ -12,286 +16,331 @@ A production-ready Next.js boilerplate template designed for AI agents to learn 
 | Database | PostgreSQL + Prisma | 7.8.0 |
 | Queue | BullMQ + Redis | 5.56.0 |
 | i18n | next-intl | 4.13.0 |
-| Auth | JWT + Google SSO + Magic Link | jsonwebtoken 9.x |
+| Auth | JWT (httpOnly cookies) + Google SSO + Magic Link | jsonwebtoken 9.x |
 | UI Library | shadcn/ui + Radix UI | latest |
 | CSS | Tailwind CSS | 4.x |
-| Real-time | Socket.IO | 4.8.3 |
-| Email | Nodemailer | 8.x |
+| Real-time | Socket.IO + Redis pub/sub bridge | 4.8.3 |
+| Email | Nodemailer (fire-and-forget via BullMQ) | 8.x |
 | Testing | Vitest + Happy DOM | 4.x |
 | Charts | Recharts | 3.8.0 |
 | Icons | Lucide React | 1.17.0 |
-| Font | Google Fonts (Prompt) | via next/font |
+| Font | Prompt (Google Fonts) | via next/font |
 
-## Features
+All versions are pinned and tested together — do not upgrade without testing.
 
-- **Authentication**: JWT httpOnly cookies, Google SSO, magic link email
-- **Authorization**: Role-based guards (USER / ADMIN) via `withAuth` / `withRoles`
-- **Theme System**: 42 handcrafted themes with light/dark/system color modes, persisted to server
-- **Landing Page**: Full marketing page with hero, features, value props, how-it-works sections
-- **Dashboard**: Charts (activity, status distribution), metrics cards, upcoming deadlines, admin overview
-- **Todos**: Full CRUD with file attachments, priorities, due dates, status tracking
-- **Internationalization**: next-intl with cookie-based locale (en/th), 400+ translated keys
-- **Background Jobs**: BullMQ queues with separate worker process (todo processing, email sending, exports)
-- **Real-time**: Socket.IO WebSocket with Redis pub/sub bridge for live updates
-- **Admin Panel**: User management (approve/reject/activate/deactivate), queue monitoring, audit log viewer, system health
-- **Storage**: Pluggable storage abstraction (local adapter included, extensible to S3/etc.)
-- **Email**: Branded email templates for magic links, notifications, quota warnings, overdue reminders
-- **Audit Logging**: Structured audit trail for all user and admin actions
-- **Quota Management**: Per-user limits on todos, file count, and storage
-- **Docker**: Multi-stage Dockerfile, docker-compose with all services
-- **Testing**: Vitest for unit and integration tests
-
-## Quick Start
-
-### With Docker (Recommended)
+## Common Commands
 
 ```bash
-# 1. Copy environment variables
-cp .env.example .env
-# Edit .env with your values (especially ENCRYPTION_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
+# ── Development ──
+npm run dev                            # Next.js dev server (http://localhost:3000)
+npm run worker                         # BullMQ background worker (separate terminal)
+bash dev.sh                            # Docker infra + app + worker in one script
 
-# 2. Start all services
-docker compose up -d
+# ── Build & Production ──
+npm run build                          # Production build (output: 'standalone')
+npm run start                          # Start production server
+node server.js                         # Custom server (Socket.IO, used in Docker prod)
+docker compose up -d --build           # Full stack via Docker
 
-# 3. Access the app
-open http://localhost:3000
+# ── Testing ──
+npm run test                           # All unit tests (Vitest, happy-dom)
+npm run test src/__tests__/auth.test.ts  # Single test file
+npm run test -- -t "pattern"           # Run tests matching name pattern
+npm run test:watch                     # Watch mode
+npm run test:integration               # Integration tests (Vitest, node env)
+npm run test:all                       # Unit + integration
+npm run test:coverage                  # Coverage report
+
+# ── Lint ──
+npm run lint                           # ESLint across the project
+
+# ── Database ──
+npx prisma generate                    # Generate Prisma client → src/generated/
+npx prisma migrate dev                 # Create/apply a migration (dev)
+npx prisma migrate deploy              # Apply pending migrations (prod)
+npx prisma studio                      # Browse DB via GUI
+npm run db:seed                        # Seed DB (creates admin user)
+npm run db:reset                       # Drop + recreate + seed
+
+# ── Queue Management ──
+npx bullmq-dashboard                   # View/manage BullMQ queues (if installed)
 ```
 
-### Without Docker
+## Quick Start (New Project)
 
 ```bash
-# 1. Copy environment variables
+# 1. Copy and edit environment
 cp .env.example .env
+# MUST set: ENCRYPTION_SECRET (32 hex chars), Google OAuth, SMTP
 
-# 2. Install dependencies
+# With Docker (recommended):
+docker compose up -d
+open http://localhost:3000
+
+# OR without Docker:
 npm install
-
-# 3. Generate Prisma client and run migrations
 npx prisma generate
 npx prisma migrate dev
-
-# 4. Seed the database
 npm run db:seed
-
-# 5. Start the development server
-npm run dev
-
-# 6. In a separate terminal, start the worker
-npm run worker
+npm run dev          # Terminal 1
+npm run worker       # Terminal 2
 ```
 
-## Project Structure
+## Architecture Overview
+
+### How the pieces connect
+
+```
+Browser ──HTTP──► Next.js (App Router) ──► Prisma ──► PostgreSQL
+   │                    │                      │
+   │              Socket.IO ◄── Redis ──► BullMQ Worker
+   │                    │           │
+   ▼                    ▼           ▼
+  Client             Real-time    Background Jobs
+  (JS)               updates      (email, todo processing)
+```
+
+### Authentication Flow
+
+1. **Login options**: Email/password (JWT), Google SSO, Magic Link
+2. **JWT** is stored in an httpOnly cookie (not localStorage). The `withAuth` / `withRoles` wrappers decode and verify on every API request.
+3. **User status matters**: New users default to `PENDING` status. They cannot access the app until an ADMIN approves them (`UserStatus.PENDING → ACTIVE`). The `pending/` page shows while waiting.
+4. **Role-based guards**: `withRoles(request, [WebUserRole.ADMIN], handler)` — two roles exist: `USER` and `ADMIN`.
+5. **Registration**: New signups trigger: audit log, email notification to admins, event bus `access:changed` publish.
+
+### Real-time Events (Socket.IO)
+
+- The custom `server.js` (NOT Next.js's default) attaches Socket.IO to the HTTP server.
+- Server publishes via `eventBus` → Redis pub/sub → `socket-server.ts` subscribes and forwards to connected clients.
+- Worker also publishes events (overdue reminders, stats) via the same Redis bridge.
+- Every event has a typed contract in `src/lib/channel-types.ts`. Add new events there first.
+- Event publishing is **best-effort**: errors are logged but never thrown.
+
+### Background Jobs (BullMQ)
+
+| Queue | Purpose | Worker |
+|-------|---------|--------|
+| `todo-processing` | Todo CRUD side-effects | `src/worker/process-todo.ts` |
+| `email-jobs` | Send emails (magic link, notifications, quota warnings) | `src/worker/process-email.ts` |
+| `export-jobs` | Data exports | handled in `src/worker/index.ts` |
+
+- Queues defined in `src/lib/queue.ts` with default retry (5 attempts, exponential backoff).
+- Workers live in `src/worker/` and run as a separate process (`npm run worker`).
+- API routes enqueue jobs and return immediately — never do expensive work inline.
+
+### i18n
+
+- `next-intl` with cookie-based locale (`NEXT_LOCALE`). No `[locale]` dynamic segment needed — `getLocale()` from the plugin handles it.
+- Messages in `messages/en.json` (400+ keys) and `messages/th.json`.
+- Switch locale by setting cookie + PATCH `/api/user/locale`.
+- Always add new keys to **both** language files.
+
+### Theme System
+
+- 42 themes defined in `src/lib/theme-catalog.ts` with CSS variables in `src/app/themes.css`.
+- Light/dark/system color modes supported.
+- Preferences stored in localStorage (FOUC prevention) and synced to user DB for cross-device persistence.
+- `ThemeScript` in `<head>` reads localStorage before React hydrates to prevent flash.
+
+### Quota System
+
+- Per-user limits on: todos count, file count, storage bytes.
+- Soft check: `checkUserQuota(userId, 'todos')` returns `{ allowed, used, limit, remaining }`.
+- Hard check: `enforceUserQuota(userId, 'files')` throws on exceed.
+- Quota warnings sent via email when user approaches limit.
+
+## Project Structure (Key Files)
 
 ```
 src/
 ├── app/
-│   ├── api/                        # API routes
-│   │   ├── admin/
-│   │   │   ├── audit-log/          # Audit log listing
-│   │   │   ├── health/             # System health check
-│   │   │   ├── queues/             # Queue management (list, retry, cancel)
-│   │   │   └── users/              # User management (list, approve, reject)
-│   │   ├── auth/                   # Auth endpoints (Google, magic link, logout, verify)
-│   │   ├── todos/                  # Todo CRUD + file attachment
-│   │   ├── dashboard/              # Dashboard data
-│   │   └── user/                   # User profile, preferences, locale, storage
-│   ├── (app)/                      # Authenticated app pages
-│   │   ├── admin/
-│   │   │   ├── audit-log/
-│   │   │   ├── queues/
-│   │   │   ├── system/
-│   │   │   └── users/
-│   │   ├── dashboard/
-│   │   ├── profile/
-│   │   ├── settings/
-│   │   └── todos/
-│   ├── (auth)/                     # Unauthenticated auth pages
-│   │   └── login/
-│   ├── pending/                    # Pending approval page
-│   ├── layout.tsx                  # Root layout (i18n, theme)
-│   ├── page.tsx                    # Landing page (redirects to dashboard or login)
-│   ├── globals.css                 # Tailwind base styles
-│   └── themes.css                  # Theme CSS variables
+│   ├── api/                    # API routes
+│   │   ├── auth/               #   Login, Google OAuth, magic link, verify, logout
+│   │   ├── todos/              #   Todo CRUD + file attachment
+│   │   ├── dashboard/          #   Dashboard data aggregation
+│   │   ├── admin/              #   User mgmt, audit log, queues, health
+│   │   └── user/               #   Profile, preferences, locale, storage
+│   ├── (app)/                  # Authenticated pages (protected by middleware)
+│   │   ├── admin/              #   Admin panel pages
+│   │   ├── dashboard/          #   Charts, metrics, upcoming deadlines
+│   │   ├── todos/              #   Todo list with CRUD UI
+│   │   ├── profile/            #   User profile
+│   │   └── settings/           #   Preferences, theme, locale
+│   ├── (auth)/login/           # Login page (public)
+│   ├── pending/                # Pending approval page
+│   ├── layout.tsx              # Root layout (i18n, theme, providers)
+│   ├── page.tsx                # Landing page (redirects to dashboard or login)
+│   ├── globals.css             # Tailwind base
+│   └── themes.css              # 42 themes as CSS vars
 ├── components/
-│   ├── layout/                     # App layout, nav, theme picker, language toggle
-│   ├── providers/                  # Theme, Socket.IO providers, ThemeScript, ThemeInitializer
-│   ├── ui/                         # shadcn/ui components (button, card, dialog, etc.)
-│   ├── landing/                    # Landing page sections (hero, features, etc.)
-│   └── dashboard/                  # Dashboard-specific charts and components
+│   ├── ui/                     # shadcn/ui primitives (button, card, dialog, etc.)
+│   ├── layout/                 # App shell, sidebar, navbar, theme picker, lang toggle
+│   ├── providers/              # ThemeProvider, SocketProvider, ThemeScript, ThemeInitializer
+│   ├── landing/                # Landing page sections
+│   └── dashboard/              # Charts, metric cards, etc.
 ├── lib/
-│   ├── auth.ts                     # JWT auth, withAuth/withRoles guards
-│   ├── audit.ts                    # Audit logging
-│   ├── audit-constants.ts          # Audit action/category constants (client-safe)
-│   ├── channel-types.ts            # Real-time channel contracts and payload types
-│   ├── dashboard.ts                # Dashboard data aggregation
-│   ├── email.ts                    # Nodemailer email sending + branded templates
-│   ├── encryption.ts               # AES-256-GCM encryption utilities
-│   ├── event-bus.ts                # Redis pub/sub event bus
-│   ├── google-oauth.ts             # Google OAuth flow helpers
-│   ├── magic-link.ts               # Magic link auth flow
-│   ├── prisma.ts                   # Prisma client singleton (Pg adapter)
-│   ├── queue.ts                    # BullMQ queue definitions
-│   ├── queue-management.ts         # Queue job helpers (list, retry, cancel)
-│   ├── quota.ts                    # Quota management (todos, files, storage)
-│   ├── redis.ts                    # Redis connection singleton
-│   ├── route-guard.ts              # Route guard utilities (parseBody, handleRouteError)
-│   ├── socket-server.ts            # Socket.IO server with Redis bridge
-│   ├── theme-catalog.ts            # Theme catalog data (42 themes) + validators
-│   ├── utils.ts                    # Utility functions (cn, formatDate)
-│   └── storage/
-│       ├── types.ts                # StorageAdapter interface
-│       ├── index.ts                # Barrel exports
-│       ├── factory.ts              # Storage adapter factory
-│       └── local-adapter.ts        # Local filesystem adapter
+│   ├── auth.ts                 # JWT auth + withAuth/withRoles guards
+│   ├── route-guard.ts          # parseBody(), handleRouteError()
+│   ├── event-bus.ts            # Redis pub/sub publisher (eventBus.todoCreated, etc.)
+│   ├── socket-server.ts        # Socket.IO server init + Redis subscriber
+│   ├── channel-types.ts        # Typed event contracts (START HERE for new events)
+│   ├── queue.ts                # BullMQ queue definitions
+│   ├── audit.ts                # Audit logging helpers
+│   ├── audit-constants.ts      # Audit action constants (client-safe)
+│   ├── encryption.ts           # AES-256-GCM encrypt/decrypt, hash, token generation
+│   ├── email.ts                # Nodemailer + branded HTML templates
+│   ├── quota.ts                # Per-user quota enforcement
+│   ├── theme-catalog.ts        # 42 theme definitions
+│   ├── prisma.ts               # Prisma singleton (Pg adapter + pool)
+│   ├── redis.ts                # Redis singleton (ioredis)
+│   ├── dashboard.ts            # Dashboard data aggregation
+│   ├── storage/                # Pluggable storage (local adapter, extensible to S3)
+│   ├── google-oauth.ts         # Google OAuth flow
+│   ├── magic-link.ts           # Magic link token verification
+│   └── utils.ts                # cn(), formatDate()
 ├── worker/
-│   ├── index.ts                    # Worker entry point
-│   ├── process-todo.ts             # Todo processing worker
-│   └── process-email.ts            # Email sending worker
-├── __tests__/                      # Test files
-└── test-setup.ts                   # Vitest test setup
+│   ├── index.ts                # Worker entry point (starts all workers)
+│   ├── process-todo.ts         # Todo processing worker
+│   └── process-email.ts        # Email sending worker
+├── __tests__/                  # Unit tests (*.test.ts) + integration tests (*.integration.test.ts)
+└── test-setup.ts               # Vitest setup (global mocks for Next.js, Socket.IO)
 
 prisma/
-├── schema.prisma                   # Database schema (WebUser, Todo, AuditLog, etc.)
-├── seed.ts                         # Database seeder (creates admin user)
-└── migrations/                     # Migration history
-
-i18n/
-└── request.ts                      # next-intl request config
+├── schema.prisma               # Models: WebUser, Todo, AuditLog, FileAttachment, etc.
+├── seed.ts                     # Seeds admin user
+└── migrations/
 
 messages/
-├── en.json                         # English translations (400+ keys)
-└── th.json                         # Thai translations
+├── en.json                     # English (400+ keys)
+└── th.json                     # Thai
 ```
+
+## Critical Gotchas (Will Break)
+
+These WILL cause confusing errors if missed. Read this section before anything else.
+
+### Prisma Client Output Path
+The Prisma client is generated to `src/generated/` (NOT `node_modules/.prisma`). Import from `@/generated/client`, not `@prisma/client`. This is set in `prisma/schema.prisma` via `output = "../src/generated"`.
+
+### ENCRYPTION_SECRET Must Be 32 Hex Characters
+The AES-256-GCM encryption expects exactly a 32-character hex string (16 bytes). If you set it to anything else, encryption/decryption will fail silently or throw. Generate one with:
+```bash
+openssl rand -hex 16
+```
+
+### Custom server.js Required for Socket.IO
+Do NOT use the default Next.js standalone server in production. The custom `server.js` creates an HTTP server, attaches Socket.IO, and forwards HTTP to Next.js's request handler. The Docker production stage runs `CMD ["node", "server.js"]`. In development, `next dev` works fine because Socket.IO is only attached in the server.
+
+### Worker Runs Separately
+The BullMQ worker is a completely separate Node process. It:
+- Does NOT serve HTTP
+- Does NOT use the Next.js router
+- Connects to Redis and PostgreSQL directly
+- Must be started separately (`npm run worker` or the `worker` Docker service)
+
+### Socket.IO + Standalone Build
+In Docker production builds, `socket-server.ts` is pre-compiled to an ESM bundle via esbuild (see Dockerfile). The standalone output doesn't trace Socket.IO dependencies because it's imported from `server.js`, not from Next.js code. Socket.IO and its transitive deps must be manually COPY'd in the Dockerfile.
+
+### Test File Split
+- `*.test.ts` → runs under `vitest.config.ts` (happy-dom environment, browser-like)
+- `*.integration.test.ts` → runs under `vitest.integration.config.ts` (node environment)
+- Both use `@/` path aliases via `vite-tsconfig-paths`
+
+### Route Guard Error Handling
+`parseBody()` returns `{ body, error }` — always check for error before using body. `handleRouteError()` maps: `AuthenticationError` → 401, `AuthorizationError` → 403, `NotFoundError` → 404, generic `Error` → 500.
+
+### Event Bus Is Best-Effort
+Publishing via eventBus logs errors but never throws. Do not rely on it for critical data — it's a notification layer only.
 
 ## Key Patterns
 
-### Authentication Guard
+### API Route Pattern (Guarded)
 
 ```typescript
+import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, withRoles } from '@/lib/auth'
+import { parseBody, handleRouteError } from '@/lib/route-guard'
 import { WebUserRole } from '@/generated/client'
 
-// Require authentication
+// Authenticated endpoint
 export async function GET(request: NextRequest) {
   return withAuth(request, async (user) => {
     return NextResponse.json({ userId: user.userId })
   })
 }
 
-// Require specific role
-export async function DELETE(request: NextRequest) {
-  return withRoles(request, [WebUserRole.ADMIN], async (user) => {
-    return NextResponse.json({ success: true })
-  })
-}
-```
-
-### Route Guard (parseBody + handleRouteError)
-
-```typescript
-import { withAuth } from '@/lib/auth'
-import { parseBody, handleRouteError } from '@/lib/route-guard'
-
+// Admin-only endpoint
 export async function POST(request: NextRequest) {
   try {
-    return await withAuth(request, async (user) => {
-      // Safely parse JSON body
+    return await withRoles(request, [WebUserRole.ADMIN], async (user) => {
       const { body, error } = await parseBody<{ title: string }>(request)
       if (error) return error
-
-      // ... do work
       return NextResponse.json({ success: true })
     })
   } catch (err) {
-    return handleRouteError(err)  // Maps Auth/NotFound errors to proper status codes
+    return handleRouteError(err)
   }
 }
 ```
 
-### Background Jobs
+### Adding a New Real-time Event
+
+Four files to touch, in order:
+
+1. **`src/lib/channel-types.ts`** — Add channel constant + payload type
+2. **`src/lib/event-bus.ts`** — Add publisher method that publishes to Redis channel
+3. **`src/lib/socket-server.ts`** — Add subscriber handler that forwards to Socket.IO rooms
+4. **Client** — `useSocketEvent('event:name', handler)` in SocketProvider
+
+### Background Job Pattern
 
 ```typescript
-import { todoProcessingQueue, TodoProcessingJobData } from '@/lib/queue'
+// src/lib/queue.ts — Define queue
+export const todoProcessingQueue = new Queue('todo-processing', {
+  connection: getRedisConnection(),
+  defaultJobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 1000 } },
+})
 
-// Enqueue a job
-await todoProcessingQueue.add('job-name', {
-  todoId: '123',
-  action: 'created',
-} as TodoProcessingJobData)
+// API route — Enqueue
+await todoProcessingQueue.add('todo-created', { todoId: '123', action: 'created' } as TodoProcessingJobData)
 
-// Process in worker (src/worker/)
-import { Worker } from 'bullmq'
-const worker = new Worker(QUEUE_NAME, async (job) => {
-  // Process job
+// src/worker/process-todo.ts — Process
+const worker = new Worker('todo-processing', async (job) => {
+  // job.data has your typed payload
 }, { connection: getRedisConnection() })
 ```
 
-### Real-time Events (Event Bus)
+### Audit Logging Pattern
 
 ```typescript
-// Publish from server
-import { eventBus } from '@/lib/event-bus'
-await eventBus.todoCreated({ userId: '123', todoId: '456', title: 'My todo' })
-await eventBus.todoUpdated({ userId: '123', todoId: '456', status: 'COMPLETED' })
-await eventBus.todoDeleted({ userId: '123', todoId: '456' })
-await eventBus.dashboardStats({ userId: '123', total: 10, pending: 3, inProgress: 2, completed: 5, cancelled: 0 })
-await eventBus.userInvalidate({ userId: '123' })
-await eventBus.accessChanged({ userId: '123', newRole: 'ADMIN' })
+import { logAuditEvent, AUDIT_ACTIONS } from '@/lib/audit'
 
-// Subscribe in client
-import { useSocketEvent } from '@/components/providers/SocketProvider'
-useSocketEvent('todo:updated', (data) => {
-  console.log('Todo updated:', data)
+await logAuditEvent({
+  userId: user.userId,
+  action: AUDIT_ACTIONS.TODO_CREATED, // or TODO_UPDATED, TODO_DELETED, USER_APPROVED, etc.
+  entityType: 'todo',
+  entityId: todo.id,
+  details: { title: todo.title },
 })
 ```
 
-Events from the worker (overdue reminders, stats recalculation) use the same Redis pub/sub bridge — the worker publishes to Redis channels and the Socket.IO server running inside the Next.js process forwards them to clients.
-
-### Storage Adapter
+### Quota Check Pattern
 
 ```typescript
-import { getStorageAdapter } from '@/lib/storage'
+import { checkUserQuota, enforceUserQuota, getStorageUsage } from '@/lib/quota'
 
-const storage = getStorageAdapter()
+// Soft check
+const check = await checkUserQuota(userId, 'todos')
+if (!check.allowed) return NextResponse.json({ error: 'Quota exceeded' }, { status: 413 })
 
-// Upload a file
-const key = await storage.upload('users/abc123/avatar.png', buffer)
+// Hard check (throws)
+await enforceUserQuota(userId, 'files')
 
-// Download
-const data = await storage.download(key)
-
-// Check existence
-const exists = await storage.exists(key)
-
-// Get public URL
-const url = await storage.getUrl(key)
-
-// Delete
-await storage.delete(key)
+// Storage usage
+const { usedBytes, quotaBytes } = await getStorageUsage(userId)
 ```
 
-### Theme System
-
-```typescript
-// Server component — pass DB-stored preferences as props
-<ThemeProvider defaultTheme={user.theme} defaultColorMode={user.colorMode}>
-
-// Client component — consume theme context
-'use client'
-import { useTheme } from '@/components/providers/ThemeProvider'
-
-function MyComponent() {
-  const { theme, colorMode, isDark, setTheme, setColorMode } = useTheme()
-
-  // Switch theme (persist to server = true)
-  setTheme('catppuccin', true)
-
-  // Toggle color mode
-  setColorMode('dark', true)
-}
-```
-
-### i18n Translations
+### i18n Pattern
 
 ```typescript
 // Server component
@@ -299,153 +348,70 @@ import { useTranslations } from 'next-intl'
 const t = useTranslations('todos')
 return <h1>{t('title')}</h1>
 
-// Client component
+// Client component — same import, just add 'use client'
 'use client'
 import { useTranslations } from 'next-intl'
 
-// Switch locale (from LanguageToggle component)
+// Switch locale (from LanguageToggle)
 document.cookie = `NEXT_LOCALE=en; path=/; max-age=31536000`
-// Also sync to server: PATCH /api/user/locale
+await fetch('/api/user/locale', { method: 'PATCH', body: JSON.stringify({ locale: 'en' }) })
 ```
 
-### Socket.IO Provider
-
-```tsx
-'use client'
-import { useSocketEvent, useSocketConnected, useConnectionStatus, useSocket } from '@/components/providers/SocketProvider'
-
-// Listen for an event
-useSocketEvent<DashboardStatsPayload>('dashboard:stats', (data) => {
-  setStats(data)
-})
-
-// Check connection status
-const connected = useSocketConnected()
-const status = useConnectionStatus() // 'connected' | 'disconnected' | 'reconnecting'
-
-// Get raw socket for emitting custom events
-const socket = useSocket()
-```
-
-### Audit Logging
+### Storage Pattern
 
 ```typescript
-import { logAuditEvent, AUDIT_ACTIONS } from '@/lib/audit'
-
-await logAuditEvent({
-  userId: user.userId,
-  action: AUDIT_ACTIONS.TODO_CREATED,
-  entityType: 'todo',
-  entityId: todo.id,
-  details: { title: todo.title },
-})
-```
-
-### Quota Management
-
-```typescript
-import { checkUserQuota, enforceUserQuota, getStorageUsage } from '@/lib/quota'
-
-// Soft check (returns { allowed, used, limit, remaining })
-const check = await checkUserQuota(userId, 'todos')
-if (!check.allowed) {
-  return NextResponse.json({ error: 'Quota exceeded' }, { status: 413 })
-}
-
-// Hard check (throws if exceeded)
-await enforceUserQuota(userId, 'files')
-
-// Get storage usage
-const { usedBytes, quotaBytes } = await getStorageUsage(userId)
-```
-
-### Admin API Routes
-
-```typescript
-import { withRoles } from '@/lib/auth'
-import { WebUserRole } from '@/generated/client'
-
-export async function GET(request: NextRequest) {
-  return withRoles(request, [WebUserRole.ADMIN], async (user) => {
-    // Admin-only logic
-  })
-}
-```
-
-### Encryption Utilities
-
-```typescript
-import { encrypt, decrypt, hash, generateRandomToken } from '@/lib/encryption'
-
-const encrypted = encrypt('sensitive data')
-const decrypted = decrypt(encrypted)
-const hashed = hash('data')
-const token = generateRandomToken() // 64-char hex string
-```
-
-### Email Sending
-
-```typescript
-import { sendMagicLinkEmail, sendNewUserNotificationToAdmins, sendAccountApprovedEmail, sendAccountRejectedEmail, sendQuotaWarningEmail, sendOverdueReminderEmail, brandedEmailWrapper, sendEmail } from '@/lib/email'
-
-// Send a plain email
-await sendEmail({ to: 'user@example.com', subject: 'Hello', html: '<p>Hi</p>' })
-
-// Send branded magic link
-await sendMagicLinkEmail('user@example.com', 'https://app.com/api/auth/verify?token=xxx')
-
-// Notify admins about new signup
-await sendNewUserNotificationToAdmins({ userEmail: 'user@example.com', userDisplayName: 'John' })
+import { getStorageAdapter } from '@/lib/storage'
+const storage = getStorageAdapter()
+await storage.upload('users/abc/avatar.png', buffer)
+await storage.download(key)
+await storage.exists(key)
+await storage.getUrl(key)
+await storage.delete(key)
 ```
 
 ## Docker Services
 
 | Service | Port | Description |
 |---------|------|-------------|
-| app | 3000 | Next.js web application |
+| app | 3000 | Next.js (dev or prod with custom server.js + Socket.IO) |
 | worker | - | BullMQ background job processor |
-| postgres | 5440 | PostgreSQL database |
-| redis | 6386 | Redis for queues and pub/sub |
+| postgres | 5442 | PostgreSQL (note: different port from .env default 5440) |
+| redis | 6388 | Redis for queues and pub/sub (different from .env default 6386) |
 
-## Testing
+Note: Docker compose uses ports 5442/6388 internally, while `docker-compose.yml` and `.env.example` may reference different port defaults for local-only development.
 
-```bash
-npm run test              # Run all unit tests
-npm run test:watch        # Watch mode
-npm run test:integration  # Integration tests
-npm run test:all          # Unit + integration
-npm run test:coverage     # Coverage report
-```
+## Testing Conventions
 
-## Extending for a New Project
+- **Unit tests** (`*.test.ts`): happy-dom environment, test components, hooks, lib functions
+- **Integration tests** (`*.integration.test.ts`): node environment, test API routes with DB
+- Both configs use `@/` path aliases — no relative imports needed
+- Test files live alongside their source in `src/__tests__/`
+- Run a single file: `npm run test src/__tests__/MyFile.test.ts`
 
-1. **Add new Prisma models** in `prisma/schema.prisma` -- run `npx prisma migrate dev`
-2. **Add new API routes** in `src/app/api/`
-3. **Add new pages** in `src/app/(app)/` for authenticated pages, or `src/app/(auth)/` for public auth pages
-4. **Add new translations** in `messages/en.json` and `messages/th.json`
-5. **Add new queues** in `src/lib/queue.ts` and workers in `src/worker/`
-6. **Add new themes** by adding entries to `THEME_CATALOG` in `src/lib/theme-catalog.ts` and CSS variables in `src/app/themes.css`
-7. **Add new languages** by creating a new `messages/{locale}.json` file and adding the locale to the language toggle
-8. **Add new UI components** with `npx shadcn@latest add <component>`
-9. **Add new storage adapters** by implementing `StorageAdapter` interface in `src/lib/storage/` and registering in `factory.ts`
-10. **Add new email templates** by creating a new function in `src/lib/email.ts` using `brandedEmailWrapper()`
-11. **Add new real-time events** by adding channel constants in `src/lib/channel-types.ts`, publisher methods in `event-bus.ts`, and handlers in `socket-server.ts`
+## Docker Build Architecture
 
-## Notes for AI Agents
+The Dockerfile has 5 stages: `base` → `deps` → `dev` → `builder` → `runner`.
 
-- All versions are pinned and tested to work together -- do not upgrade without testing
-- The `withAuth` / `withRoles` pattern must be used on every authenticated API route
-- Background jobs go through BullMQ queues, never run expensive operations in API routes
-- The worker process runs separately from the web server in production
-- Socket.IO requires the custom `server.js` -- do not use the default Next.js server in production
-- i18n locale is stored in a cookie (`NEXT_LOCALE`) and managed by next-intl
-- Translations are loaded from JSON files in `messages/` -- add new keys there
-- The root layout uses `getLocale()` from next-intl -- no `[locale]` dynamic segment is needed
-- Theme preferences are stored in localStorage for fast FOUC prevention and synced to the server DB for cross-device persistence
-- Prisma client is generated to `src/generated/` (not the default `node_modules/.prisma`) -- import from `@/generated/client`
-- Database adapter uses `@prisma/adapter-pg` with `pg` pool for PostgreSQL connection pooling
-- All event publishing is best-effort -- errors are logged but never thrown to avoid blocking the request pipeline
-- Email sending uses fire-and-forget via BullMQ queues -- SMTP failures in API routes must not crash the web server
-- The `parseBody` helper returns a discriminated union `{ body, error }` -- always check for error before using body
-- The `handleRouteError` helper handles `AuthenticationError` (401), `AuthorizationError` (403), `NotFoundError` (404), and generic `Error` (500)
-- Test files use `@/` path aliases via `vite-tsconfig-paths` plugin -- no relative imports needed in tests
+Key details for the production build:
+- `next.config.ts` sets `output: 'standalone'`
+- The `builder` stage extracts `standalone-config.json` from the built output so `server.js` can configure Next.js without webpack
+- `socket-server.ts` is compiled to an ESM bundle via esbuild with `socket.io`, `ioredis`, `pg`, and `@prisma/adapter-pg` as externals
+- The `runner` stage manually copies Socket.IO and ioredis transitive dependencies that Next.js's standalone tracer misses
+- The `worker` stage is a separate image target — it just runs `src/worker/index.ts`
+
+## What to Customize for a New Project
+
+When using this as a template:
+
+1. **`.env.example`** — Change app name, URLs, secrets. Generate a real `ENCRYPTION_SECRET`.
+2. **`package.json`** — Update `name`, `version`, description.
+3. **`docker-compose.yml`** — Change service names, container names, exposed ports, DB names, env vars.
+4. **`messages/`** — Add your own translation files (keep `en.json` as reference).
+5. **Prisma schema** — Add your own models. Run `npx prisma migrate dev` for the first migration.
+6. **Theme catalog** — Replace or trim `THEME_CATALOG` in `src/lib/theme-catalog.ts`.
+7. **`server.js`** — The app name in startup logs.
+8. **`src/app/themes.css`** — Replace with your brand colors, or keep the 42 themes.
+9. **Email templates** — Update `brandedEmailWrapper()` in `src/lib/email.ts` with your brand.
+10. **Landing page** — Replace `src/components/landing/` with your own sections.
+11. **Font** — Change the Google Font import in the root layout.
+12. **Quota limits** — Adjust defaults in `src/lib/quota.ts` and `prisma/seed.ts`.
