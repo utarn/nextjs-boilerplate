@@ -28,6 +28,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog'
 import { useSocketEvent } from '@/components/providers/SocketProvider'
+import type { TodoCreatedPayload, TodoUpdatedPayload, TodoDeletedPayload } from '@/lib/channel-types'
 
 type TodoStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
 type TodoPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
@@ -118,10 +119,27 @@ export function TodosPageClient() {
     fetchTodos()
   }, [fetchTodos])
 
-  // Real-time updates
-  useSocketEvent('todo:created', () => fetchTodos())
-  useSocketEvent('todo:updated', () => fetchTodos())
-  useSocketEvent('todo:deleted', () => fetchTodos())
+  // Real-time updates — typed socket events
+  useSocketEvent<TodoCreatedPayload>('todo:created', () => {
+    // New todo created: refetch the full list to get complete data
+    fetchTodos()
+  })
+
+  useSocketEvent<TodoUpdatedPayload>('todo:updated', (data) => {
+    // Optimistically update status locally for immediate feedback
+    setTodos((prev) =>
+      prev.map((t) =>
+        t.id === data.todoId ? { ...t, status: data.status as TodoStatus } : t,
+      ),
+    )
+    // Refetch in the background to sync any other field changes
+    fetchTodos()
+  })
+
+  useSocketEvent<TodoDeletedPayload>('todo:deleted', (data) => {
+    // Remove the deleted todo from the local list immediately
+    setTodos((prev) => prev.filter((t) => t.id !== data.todoId))
+  })
 
   const resetCreateForm = () => {
     setNewTitle('')

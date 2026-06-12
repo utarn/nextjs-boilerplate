@@ -1,34 +1,27 @@
 import Redis from 'ioredis'
 import { getRedisConnection } from '@/lib/redis'
+import {
+  CHANNEL_TODO_CREATED,
+  CHANNEL_TODO_UPDATED,
+  CHANNEL_TODO_DELETED,
+  CHANNEL_DASHBOARD_STATS,
+  CHANNEL_USER_INVALIDATE,
+  CHANNEL_ACCESS_CHANGED,
+} from '@/lib/channel-types'
+
+// Re-export payload types for consumers that currently import them from here.
+export type {
+  TodoCreatedPayload,
+  TodoUpdatedPayload,
+  TodoDeletedPayload,
+  DashboardStatsPayload,
+  UserInvalidatePayload,
+  AccessChangedPayload,
+} from '@/lib/channel-types'
 
 // ---------------------------------------------------------------------------
-// Redis pub/sub event channels
+// EventBus — typed Redis pub/sub publisher
 // ---------------------------------------------------------------------------
-
-export const CHANNEL_TODO_CREATED = 'todo:created'
-export const CHANNEL_TODO_UPDATED = 'todo:updated'
-export const CHANNEL_TODO_DELETED = 'todo:deleted'
-export const CHANNEL_DASHBOARD_STATS = 'dashboard:stats'
-
-// ---------------------------------------------------------------------------
-// Event payload types
-// ---------------------------------------------------------------------------
-
-export interface TodoEventPayload {
-  userId: string
-  todoId: string
-  title?: string
-  status?: string
-}
-
-export interface DashboardStatsPayload {
-  userId: string
-  total: number
-  pending: number
-  inProgress: number
-  completed: number
-  cancelled: number
-}
 
 // ---------------------------------------------------------------------------
 // Publisher
@@ -42,44 +35,6 @@ function getPublisher(): Redis {
   }
   return publisher
 }
-
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
-
-export const eventBus = {
-  /**
-   * Broadcast that a todo was created.
-   */
-  async todoCreated(data: TodoEventPayload): Promise<void> {
-    await publish(CHANNEL_TODO_CREATED, data)
-  },
-
-  /**
-   * Broadcast that a todo was updated.
-   */
-  async todoUpdated(data: TodoEventPayload): Promise<void> {
-    await publish(CHANNEL_TODO_UPDATED, data)
-  },
-
-  /**
-   * Broadcast that a todo was deleted.
-   */
-  async todoDeleted(data: TodoEventPayload): Promise<void> {
-    await publish(CHANNEL_TODO_DELETED, data)
-  },
-
-  /**
-   * Broadcast updated dashboard stats for a user.
-   */
-  async dashboardStats(data: DashboardStatsPayload): Promise<void> {
-    await publish(CHANNEL_DASHBOARD_STATS, data)
-  },
-}
-
-// ---------------------------------------------------------------------------
-// Internal publish helper
-// ---------------------------------------------------------------------------
 
 /**
  * Publish a JSON payload to a Redis channel.
@@ -96,4 +51,52 @@ async function publish(channel: string, payload: unknown): Promise<void> {
       err instanceof Error ? err.message : err,
     )
   }
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+export const eventBus = {
+  /**
+   * Broadcast that a todo was created.
+   */
+  async todoCreated(data: import('./channel-types').TodoCreatedPayload): Promise<void> {
+    await publish(CHANNEL_TODO_CREATED, data)
+  },
+
+  /**
+   * Broadcast that a todo was updated.
+   */
+  async todoUpdated(data: import('./channel-types').TodoUpdatedPayload): Promise<void> {
+    await publish(CHANNEL_TODO_UPDATED, data)
+  },
+
+  /**
+   * Broadcast that a todo was deleted.
+   */
+  async todoDeleted(data: import('./channel-types').TodoDeletedPayload): Promise<void> {
+    await publish(CHANNEL_TODO_DELETED, data)
+  },
+
+  /**
+   * Broadcast updated dashboard stats for a user.
+   */
+  async dashboardStats(data: import('./channel-types').DashboardStatsPayload): Promise<void> {
+    await publish(CHANNEL_DASHBOARD_STATS, data)
+  },
+
+  /**
+   * Broadcast that a user should be invalidated (force-disconnected).
+   */
+  async userInvalidate(data: import('./channel-types').UserInvalidatePayload): Promise<void> {
+    await publish(CHANNEL_USER_INVALIDATE, data)
+  },
+
+  /**
+   * Broadcast that a user's access changed (role update).
+   */
+  async accessChanged(data: import('./channel-types').AccessChangedPayload): Promise<void> {
+    await publish(CHANNEL_ACCESS_CHANGED, data)
+  },
 }
