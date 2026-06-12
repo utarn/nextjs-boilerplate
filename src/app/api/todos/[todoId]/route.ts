@@ -3,11 +3,12 @@ import { withAuth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { todoProcessingQueue, TodoProcessingJobData } from '@/lib/queue'
 import { logAuditEvent, AUDIT_ACTIONS } from '@/lib/audit'
-import { checkUserQuota } from '@/lib/quota'
+import { checkUserQuota, getStorageUsage } from '@/lib/quota'
 import { handleRouteError, NotFoundError } from '@/lib/route-guard'
 import { eventBus } from '@/lib/event-bus'
 import { getStorageAdapter } from '@/lib/storage'
 import { TodoPriority, TodoStatus } from '@/generated/client'
+import { sendQuotaWarningEmail } from '@/lib/email'
 
 export async function PATCH(
   request: NextRequest,
@@ -127,6 +128,33 @@ export async function PATCH(
           where: { id: user.userId },
           data: { storageUsedBytes: { increment: file.size } },
         })
+
+        // Check remaining storage against the configurable warning
+        // threshold and enqueue a quota warning email if needed
+        // (fire-and-forget so SMTP failures don't crash the web server).
+        const thresholdMB = parseInt(
+          process.env.QUOTA_WARNING_THRESHOLD_MB || '100',
+          10,
+        )
+        getStorageUsage(user.userId)
+          .then(({ usedBytes, quotaBytes }) => {
+            const remainingBytes = quotaBytes - usedBytes
+            const remainingMB = Number(remainingBytes / BigInt(1048576))
+            if (quotaBytes > 0 && remainingMB < thresholdMB) {
+              sendQuotaWarningEmail({
+                to: user.email,
+                displayName: user.displayName,
+                usedBytes,
+                quotaBytes,
+                remainingBytes,
+              }).catch((err) => {
+                console.error('[todos] Failed to send quota warning:', err)
+              })
+            }
+          })
+          .catch((err) => {
+            console.error('[todos] Failed to check storage quota:', err)
+          })
 
         newAttachmentPath = key
         newAttachmentName = file.name

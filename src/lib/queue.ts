@@ -73,8 +73,16 @@ export interface TodoProcessingJobData {
 
 /**
  * Shape of an email job.
+ * `type` is informational / for observability — the worker always sends
+ * whatever html/text the caller provides.
  */
 export interface EmailJobData {
+  type:
+    | 'new-user-notification'
+    | 'account-approved'
+    | 'account-rejected'
+    | 'quota-warning'
+    | 'overdue-reminder'
   to: string
   subject: string
   html: string

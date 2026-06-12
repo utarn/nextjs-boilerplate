@@ -208,6 +208,56 @@
     "en": "English",
     "th": "ไทย"
   },
+  "email": {
+    "magicLink": {
+      "subject": "Sign in to {appName}",
+      "heading": "Sign in to {appName}",
+      "body": "Click the button below to sign in. This link expires in {minutes} minutes.",
+      "cta": "Sign In",
+      "ignoreHint": "If you did not request this link, you can safely ignore this email.",
+      "fallbackLink": "If the button above does not work, copy and paste this URL into your browser:"
+    },
+    "newUserNotification": {
+      "subject": "New user signup: {displayName}",
+      "heading": "New User Signup",
+      "body": "A new user has signed up and is awaiting approval:",
+      "nameLabel": "Name:",
+      "emailLabel": "Email:",
+      "cta": "Review in Admin Panel"
+    },
+    "accountApproved": {
+      "subject": "Your account has been approved - {appName}",
+      "heading": "Account Approved",
+      "greeting": "Hello {displayName},",
+      "body": "Your account has been approved. You can now sign in to {appName}.",
+      "cta": "Sign In"
+    },
+    "accountRejected": {
+      "subject": "Your account request was not approved - {appName}",
+      "heading": "Account Not Approved",
+      "greeting": "Hello {displayName},",
+      "body": "We regret to inform you that your account request was not approved. If you believe this is an error, please contact your administrator."
+    },
+    "quotaWarning": {
+      "subject": "Storage quota warning - {appName}",
+      "heading": "Storage Quota Warning",
+      "greeting": "Hello {displayName},",
+      "body": "Your storage usage is approaching the quota limit on {appName}.",
+      "usageLabel": "Current usage:",
+      "quotaLabel": "Quota limit:",
+      "remainingLabel": "Remaining:",
+      "warningText": "Once the quota is reached, new file attachments will not be accepted. Please contact your administrator to request a quota increase."
+    },
+    "overdueReminder": {
+      "subject": "{count} overdue {count, plural, one {todo} other {todos}} on {appName}",
+      "heading": "{count, plural, one {Overdue Todo} other {Overdue Todos}}",
+      "greeting": "Hello {displayName},",
+      "body": "You have {count} overdue {count, plural, one {todo} other {todos}}:",
+      "dueLabel": "(due: {date})",
+      "cta": "View My Todos"
+    },
+    "footer": "{appName} — Your productivity platform"
+  },
   "Landing": {
     "navbar": {
       "brand": "TaskFlow",
