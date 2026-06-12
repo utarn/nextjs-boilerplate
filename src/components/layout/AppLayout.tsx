@@ -10,6 +10,7 @@ import { LanguageToggle } from '@/components/layout/LanguageToggle'
 import { ThemePickerDropdown } from '@/components/layout/ThemePickerDropdown'
 import { ColorModeToggle } from '@/components/layout/ColorModeToggle'
 import { ThemeInitializer } from '@/components/providers/ThemeInitializer'
+import { ConnectionStatusIndicator } from '@/components/providers/SocketProvider'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -138,7 +139,9 @@ export function AppLayout({ children, user, defaultTheme, defaultColorMode }: Ap
       </div>
 
       {/* Top bar */}
-      <div className="fixed top-0 right-0 md:left-64 h-14 border-b bg-background z-40" />
+      <div className="fixed top-0 right-0 md:left-64 h-14 border-b bg-background z-40 flex items-center justify-end px-6">
+        <ConnectionStatusIndicator />
+      </div>
 
       {/* Main content */}
       <main className="md:ml-64 pt-14 md:pt-14 min-h-screen">

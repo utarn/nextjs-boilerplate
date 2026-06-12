@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { verifyToken } from '@/lib/auth'
 import { getDashboardData } from '@/lib/dashboard'
 import type { RecentTodo, UpcomingDeadline } from '@/lib/dashboard'
+import { LiveDashboardUpdater } from '@/components/dashboard/LiveDashboardUpdater'
 import {
   Card,
   CardContent,
@@ -138,6 +139,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      <LiveDashboardUpdater />
+
       {/* Page heading */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>

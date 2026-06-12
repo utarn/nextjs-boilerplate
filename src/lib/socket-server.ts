@@ -12,7 +12,15 @@ import {
   CHANNEL_TODO_UPDATED,
   CHANNEL_TODO_DELETED,
   CHANNEL_DASHBOARD_STATS,
-} from '@/lib/event-bus'
+  CHANNEL_USER_INVALIDATE,
+  CHANNEL_ACCESS_CHANGED,
+  type TodoCreatedPayload,
+  type TodoUpdatedPayload,
+  type TodoDeletedPayload,
+  type DashboardStatsPayload,
+  type UserInvalidatePayload,
+  type AccessChangedPayload,
+} from '@/lib/channel-types'
 
 // ---------------------------------------------------------------------------
 // Socket.IO Server — auth handshake + Redis bridge
@@ -21,6 +29,8 @@ import {
 // Authenticates every connection via the `auth_token` cookie + JWT verification
 // + DB status check. Subscribes to Redis pub/sub channels and forwards
 // events to the appropriate Socket.IO rooms (user-specific).
+// Supports user invalidation (force-disconnect) and access-change
+// resubscription (recomputation of socket rooms without disconnection).
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -28,6 +38,8 @@ import {
 // ---------------------------------------------------------------------------
 
 const COOKIE_NAME = 'auth_token'
+
+const ADMIN_ROOM = 'admin:room'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -40,6 +52,19 @@ export function extractAuthToken(cookieHeader: string | undefined): string | nul
   if (!cookieHeader) return null
   const cookies = parse(cookieHeader)
   return cookies[COOKIE_NAME] || null
+}
+
+/**
+ * Determine which supplementary rooms a user should be joined to based on
+ * their role. Every authenticated user is always in their `user:userId` room;
+ * this returns additional role-based rooms.
+ */
+function getRoleRooms(role: string): string[] {
+  const rooms: string[] = []
+  if (role === 'ADMIN') {
+    rooms.push(ADMIN_ROOM)
+  }
+  return rooms
 }
 
 // ---------------------------------------------------------------------------
@@ -57,8 +82,12 @@ let subscriber: Redis | null = null
  * Initialise Socket.IO on the given HTTP server.
  *
  * - Registers a middleware that authenticates via `auth_token` cookie.
- * - On successful connect, joins a user-specific room for targeted events.
+ * - On successful connect, joins a user-specific room for targeted events
+ *   and role-based rooms for role-targeted broadcasts.
  * - Subscribes to Redis channels and bridges events to Socket.IO rooms.
+ * - Handles `user:invalidate` events by force-disconnecting matching sockets.
+ * - Handles `access:changed` events by recomputing room subscriptions
+ *   without disconnecting the user.
  *
  * Returns the Socket.IO server instance.
  */
@@ -115,6 +144,11 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
     // Join a user-specific room for targeted events
     socket.join(`user:${user.userId}`)
 
+    // Join role-based rooms (e.g. admin:room for ADMIN users)
+    for (const room of getRoleRooms(user.role)) {
+      socket.join(room)
+    }
+
     console.log(`[socket] User ${user.email} connected`)
 
     socket.on('disconnect', (reason) => {
@@ -132,6 +166,8 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
     CHANNEL_TODO_UPDATED,
     CHANNEL_TODO_DELETED,
     CHANNEL_DASHBOARD_STATS,
+    CHANNEL_USER_INVALIDATE,
+    CHANNEL_ACCESS_CHANGED,
   )
 
   subscriber.on('message', async (channel: string, message: string) => {
@@ -140,26 +176,73 @@ export function initSocketServer(httpServer: HTTPServer): SocketIOServer {
 
       switch (channel) {
         case CHANNEL_TODO_CREATED: {
-          const { userId, todoId, title } = payload
+          const { userId, todoId, title } = payload as TodoCreatedPayload
           io?.to(`user:${userId}`).emit('todo:created', { todoId, title })
           break
         }
 
         case CHANNEL_TODO_UPDATED: {
-          const { userId, todoId, status } = payload
+          const { userId, todoId, status } = payload as TodoUpdatedPayload
           io?.to(`user:${userId}`).emit('todo:updated', { todoId, status })
           break
         }
 
         case CHANNEL_TODO_DELETED: {
-          const { userId, todoId } = payload
+          const { userId, todoId } = payload as TodoDeletedPayload
           io?.to(`user:${userId}`).emit('todo:deleted', { todoId })
           break
         }
 
         case CHANNEL_DASHBOARD_STATS: {
-          const statsPayload = payload as { userId: string; total: number; completed: number }
+          const statsPayload = payload as DashboardStatsPayload
           io?.to(`user:${statsPayload.userId}`).emit('dashboard:stats', statsPayload)
+          break
+        }
+
+        case CHANNEL_USER_INVALIDATE: {
+          // Force-disconnect all sockets belonging to the invalidated user
+          const { userId } = payload as UserInvalidatePayload
+          const userRoom = `user:${userId}`
+          io?.to(userRoom).disconnectSockets(true)
+          console.log(`[socket] Invalidated user ${userId} — disconnected all sockets`)
+          break
+        }
+
+        case CHANNEL_ACCESS_CHANGED: {
+          // Recompute room subscriptions for the affected user's sockets
+          // without disconnecting them
+          const { userId, newRole } = payload as AccessChangedPayload
+          const userRoom = `user:${userId}`
+          const sockets = await io?.in(userRoom).fetchSockets()
+
+          if (sockets && sockets.length > 0) {
+            const newRoleRooms = getRoleRooms(newRole)
+
+            for (const socket of sockets) {
+              // Determine current rooms (excluding socket.id default and user room)
+              const currentRooms = new Set(socket.rooms)
+              currentRooms.delete(socket.id)
+              currentRooms.delete(userRoom)
+
+              // Leave rooms that are no longer accessible
+              for (const room of currentRooms) {
+                if (!newRoleRooms.includes(room)) {
+                  socket.leave(room)
+                }
+              }
+
+              // Join rooms that are newly accessible
+              for (const room of newRoleRooms) {
+                if (!currentRooms.has(room)) {
+                  socket.join(room)
+                }
+              }
+            }
+
+            console.log(
+              `[socket] Updated room subscriptions for user ${userId} (role: ${newRole})`,
+            )
+          }
           break
         }
       }
