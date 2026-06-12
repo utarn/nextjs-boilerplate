@@ -117,7 +117,7 @@ export async function setAuthCookie(token: string): Promise<void> {
  * @param redirectTo - Absolute URL string to redirect to.
  */
 export function createAuthSession(
-  user: Pick<WebUser, 'id' | 'email' | 'displayName' | 'role'>,
+  user: Pick<WebUser, 'id' | 'email' | 'displayName' | 'role' | 'locale'>,
   redirectTo: string,
 ): NextResponse {
   const jwtToken = generateToken({
@@ -129,6 +129,15 @@ export function createAuthSession(
 
   const response = NextResponse.redirect(new URL(redirectTo))
   response.cookies.set(COOKIE_NAME, jwtToken, AUTH_COOKIE_OPTIONS)
+
+  // If the user has a saved locale preference, set the NEXT_LOCALE cookie
+  if (user.locale) {
+    response.cookies.set('NEXT_LOCALE', user.locale, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      sameSite: 'lax' as const,
+    })
+  }
 
   return response
 }

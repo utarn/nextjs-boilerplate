@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { HardDrive } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -23,6 +24,8 @@ function getStorageBarColor(pct: number): string {
 }
 
 export function StorageUsageCard({ usedBytes: usedBytesStr, quotaBytes: quotaBytesStr }: StorageUsageCardProps) {
+  const t = useTranslations('profile')
+
   const usedBytes = BigInt(usedBytesStr)
   const quotaBytes = BigInt(quotaBytesStr)
 
@@ -31,9 +34,9 @@ export function StorageUsageCard({ usedBytes: usedBytesStr, quotaBytes: quotaByt
   const quotaMB = isUnlimited ? -1 : Number(quotaBytes / BigInt(1048576))
 
   const usedLabel = formatMB(usedMB)
-  const quotaLabel = isUnlimited ? 'Unlimited' : formatMB(quotaMB)
+  const quotaLabel = isUnlimited ? t('storageUnlimited') : formatMB(quotaMB)
   const remainingMB = isUnlimited ? Infinity : Math.max(quotaMB - usedMB, 0)
-  const remainingLabel = isUnlimited ? 'Unlimited' : formatMB(remainingMB)
+  const remainingLabel = isUnlimited ? t('storageUnlimited') : formatMB(remainingMB)
   const pct = isUnlimited ? 0 : Math.min((usedMB / quotaMB) * 100, 100)
 
   return (
@@ -44,14 +47,14 @@ export function StorageUsageCard({ usedBytes: usedBytesStr, quotaBytes: quotaByt
           <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
             <HardDrive className="size-4 text-primary" />
           </div>
-          <h3 className="text-sm font-semibold text-foreground">Storage Usage</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('storageUsage')}</h3>
         </div>
 
         {isUnlimited ? (
           /* Unlimited: show usage count only, no progress bar */
           <div>
-            <p className="text-sm text-muted-foreground">Storage Unlimited</p>
-            <p className="mt-1 text-sm font-medium text-foreground">Used: {usedLabel}</p>
+            <p className="text-sm text-muted-foreground">{t('storageUnlimited')}</p>
+            <p className="mt-1 text-sm font-medium text-foreground">{t('usedLabel', { used: usedLabel })}</p>
           </div>
         ) : (
           /* Limited: show usage, quota, remaining, progress bar */
@@ -59,15 +62,15 @@ export function StorageUsageCard({ usedBytes: usedBytesStr, quotaBytes: quotaByt
             {/* Stats row */}
             <div className="grid grid-cols-3 gap-4 mb-3">
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Used</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('used')}</p>
                 <p className="mt-0.5 text-sm font-semibold text-foreground tabular-nums">{usedLabel}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quota</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('quota')}</p>
                 <p className="mt-0.5 text-sm font-semibold text-foreground tabular-nums">{quotaLabel}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Remaining</p>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('remaining')}</p>
                 <p className="mt-0.5 text-sm font-semibold text-foreground tabular-nums">{remainingLabel}</p>
               </div>
             </div>

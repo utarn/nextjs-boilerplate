@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   RefreshCw,
   UserCheck,
@@ -41,7 +42,7 @@ interface UsersResponse {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Constants
 // ---------------------------------------------------------------------------
 
 const STATUS_COLORS: Record<string, string> = {
@@ -51,12 +52,6 @@ const STATUS_COLORS: Record<string, string> = {
     'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
   INACTIVE:
     'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-}
-
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Pending',
-  ACTIVE: 'Active',
-  INACTIVE: 'Inactive',
 }
 
 const ROLE_COLORS: Record<string, string> = {
@@ -74,6 +69,8 @@ type TabValue = (typeof TAB_VALUES)[number]
 // ---------------------------------------------------------------------------
 
 export default function AdminUsersPage() {
+  const t = useTranslations('Admin.users')
+  const tCommon = useTranslations('common')
   const [users, setUsers] = useState<WebUser[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -81,8 +78,19 @@ export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
+  const statusLabels: Record<string, string> = useMemo(() => ({
+    PENDING: t('pending'),
+    ACTIVE: t('active'),
+    INACTIVE: t('inactive'),
+  }), [t])
+
+  const roleLabels: Record<string, string> = useMemo(() => ({
+    ADMIN: t('userRoleAdmin'),
+    USER: t('userRoleUser'),
+  }), [t])
+
   // -----------------------------------------------------------------------
-  // Data fetching — always fetch all users, filter client-side
+  // Data fetching
   // -----------------------------------------------------------------------
 
   const fetchUsers = useCallback(async () => {
@@ -97,7 +105,7 @@ export default function AdminUsersPage() {
 
       const res = await fetch(`/api/admin/users?${params.toString()}`)
       if (!res.ok) {
-        throw new Error(`Failed to fetch users (${res.status})`)
+        throw new Error(t('errorLoading'))
       }
 
       const data: UsersResponse = await res.json()
@@ -105,12 +113,12 @@ export default function AdminUsersPage() {
     } catch (err) {
       console.error('Failed to fetch users:', err)
       setError(
-        err instanceof Error ? err.message : 'Failed to load users',
+        err instanceof Error ? err.message : t('errorLoading'),
       )
     } finally {
       setLoading(false)
     }
-  }, [searchQuery])
+  }, [searchQuery, t])
 
   useEffect(() => {
     fetchUsers()
@@ -144,7 +152,7 @@ export default function AdminUsersPage() {
   }, [users])
 
   // -----------------------------------------------------------------------
-  // Actions — approve / reject / activate / deactivate
+  // Actions
   // -----------------------------------------------------------------------
 
   const updateUserStatus = useCallback(
@@ -197,24 +205,24 @@ export default function AdminUsersPage() {
               variant="default"
               disabled={isLoading}
               onClick={() => updateUserStatus(user.id, 'approve')}
-              title="Approve user"
+              title={t('approveConfirm')}
             >
               {isLoading ? (
                 <RefreshCw className="h-4 w-4 animate-spin" />
               ) : (
                 <UserCheck className="h-4 w-4 mr-1" />
               )}
-              Approve
+              {t('approve')}
             </Button>
             <Button
               size="sm"
               variant="destructive"
               disabled={isLoading}
               onClick={() => updateUserStatus(user.id, 'reject')}
-              title="Reject user"
+              title={t('rejectConfirm')}
             >
               <UserX className="h-4 w-4 mr-1" />
-              Reject
+              {t('reject')}
             </Button>
           </div>
         )
@@ -227,14 +235,14 @@ export default function AdminUsersPage() {
               variant="outline"
               disabled={isLoading}
               onClick={() => updateUserStatus(user.id, 'deactivate')}
-              title="Deactivate user"
+              title={t('deactivateConfirm')}
             >
               {isLoading ? (
                 <RefreshCw className="h-4 w-4 animate-spin" />
               ) : (
                 <UserMinus className="h-4 w-4 mr-1" />
               )}
-              Deactivate
+              {t('deactivate')}
             </Button>
           </div>
         )
@@ -247,14 +255,14 @@ export default function AdminUsersPage() {
               variant="default"
               disabled={isLoading}
               onClick={() => updateUserStatus(user.id, 'activate')}
-              title="Activate user"
+              title={t('activateConfirm')}
             >
               {isLoading ? (
                 <RefreshCw className="h-4 w-4 animate-spin" />
               ) : (
                 <UserPlus className="h-4 w-4 mr-1" />
               )}
-              Activate
+              {t('activate')}
             </Button>
           </div>
         )
@@ -269,12 +277,12 @@ export default function AdminUsersPage() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Email</TableHead>
-            <TableHead>Display Name</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Created</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t('email')}</TableHead>
+            <TableHead>{t('displayName')}</TableHead>
+            <TableHead>{t('role')}</TableHead>
+            <TableHead>{t('status')}</TableHead>
+            <TableHead>{t('createdAt')}</TableHead>
+            <TableHead className="text-right">{t('actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -284,7 +292,7 @@ export default function AdminUsersPage() {
                 colSpan={6}
                 className="text-center py-8 text-muted-foreground"
               >
-                No users found.
+                {t('noUsers')}
               </TableCell>
             </TableRow>
           ) : (
@@ -299,7 +307,7 @@ export default function AdminUsersPage() {
                     variant="outline"
                     className={ROLE_COLORS[user.role] || ''}
                   >
-                    {user.role}
+                    {roleLabels[user.role] || user.role}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -307,7 +315,7 @@ export default function AdminUsersPage() {
                     variant="outline"
                     className={STATUS_COLORS[user.status] || ''}
                   >
-                    {STATUS_LABELS[user.status] || user.status}
+                    {statusLabels[user.status] || user.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
@@ -350,7 +358,7 @@ export default function AdminUsersPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">User Management</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <Button
           variant="outline"
           size="sm"
@@ -360,13 +368,13 @@ export default function AdminUsersPage() {
           <RefreshCw
             className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`}
           />
-          Refresh
+          {tCommon('refresh')}
         </Button>
       </div>
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle>Users</CardTitle>
+          <CardTitle>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs
@@ -376,25 +384,25 @@ export default function AdminUsersPage() {
             <div className="flex items-center justify-between mb-4">
               <TabsList>
                 <TabsTrigger value="all">
-                  All{' '}
+                  {t('all')}{' '}
                   <span className="ml-1 text-xs text-muted-foreground">
                     ({tabCounts.all})
                   </span>
                 </TabsTrigger>
                 <TabsTrigger value="PENDING">
-                  Pending{' '}
+                  {t('pending')}{' '}
                   <span className="ml-1 text-xs text-muted-foreground">
                     ({tabCounts.PENDING})
                   </span>
                 </TabsTrigger>
                 <TabsTrigger value="ACTIVE">
-                  Active{' '}
+                  {t('active')}{' '}
                   <span className="ml-1 text-xs text-muted-foreground">
                     ({tabCounts.ACTIVE})
                   </span>
                 </TabsTrigger>
                 <TabsTrigger value="INACTIVE">
-                  Inactive{' '}
+                  {t('inactive')}{' '}
                   <span className="ml-1 text-xs text-muted-foreground">
                     ({tabCounts.INACTIVE})
                   </span>
@@ -405,7 +413,7 @@ export default function AdminUsersPage() {
               <div className="flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Search by email..."
+                  placeholder={t('searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex h-9 w-48 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -419,7 +427,7 @@ export default function AdminUsersPage() {
                 <p className="text-destructive mb-2">{error}</p>
                 <Button variant="outline" size="sm" onClick={fetchUsers}>
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Retry
+                  {tCommon('retry')}
                 </Button>
               </div>
             )}

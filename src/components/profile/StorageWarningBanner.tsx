@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { AlertTriangle, X } from 'lucide-react'
 
 interface StorageWarningBannerProps {
@@ -18,6 +19,7 @@ function formatMB(mb: number): string {
 
 export function StorageWarningBanner({ usedBytes: usedBytesStr, quotaBytes: quotaBytesStr }: StorageWarningBannerProps) {
   const [dismissed, setDismissed] = useState(false)
+  const t = useTranslations('profile')
 
   const usedBytes = BigInt(usedBytesStr)
   const quotaBytes = BigInt(quotaBytesStr)
@@ -44,17 +46,16 @@ export function StorageWarningBanner({ usedBytes: usedBytesStr, quotaBytes: quot
     >
       <AlertTriangle className="size-5 shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold">Storage Almost Full</p>
+        <p className="text-sm font-semibold">{t('storageAlmostFull')}</p>
         <p className="mt-1 text-sm">
-          You have {remainingLabel} of {quotaLabel} remaining. Free up space by deleting
-          unused file attachments.
+          {t('storageWarning', { remaining: remainingLabel, quota: quotaLabel })}
         </p>
       </div>
       <button
         type="button"
         onClick={() => setDismissed(true)}
         className="shrink-0 rounded-md p-1 hover:bg-yellow-100 dark:hover:bg-yellow-900/50 transition-colors"
-        aria-label="Dismiss"
+        aria-label={t('dismiss')}
       >
         <X className="size-4" />
       </button>

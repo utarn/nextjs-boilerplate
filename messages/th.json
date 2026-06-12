@@ -14,7 +14,13 @@
     "settings": "การตั้งค่า",
     "back": "ย้อนกลับ",
     "yes": "ใช่",
-    "no": "ไม่ใช่"
+    "no": "ไม่ใช่",
+    "unlimited": "ไม่จำกัด",
+    "notAvailable": "N/A",
+    "retry": "ลองใหม่",
+    "status": "สถานะ",
+    "processing": "กำลังดำเนินการ",
+    "finished": "เสร็จสิ้น"
   },
   "Login": {
     "title": "เข้าสู่ระบบ",
@@ -51,7 +57,32 @@
     "profile": "โปรไฟล์",
     "settings": "การตั้งค่า",
     "admin": "ผู้ดูแลระบบ",
+    "users": "ผู้ใช้",
+    "queues": "คิว",
+    "auditLog": "บันทึกการตรวจสอบ",
+    "system": "ระบบ",
     "logout": "ออกจากระบบ"
+  },
+  "settings": {
+    "theme": "ธีม",
+    "language": "ภาษา"
+  },
+  "profile": {
+    "title": "โปรไฟล์",
+    "loading": "กำลังโหลด...",
+    "errorLoad": "ไม่สามารถโหลดโปรไฟล์ได้",
+    "email": "อีเมล",
+    "role": "สิทธิ์",
+    "joined": "เข้าร่วมเมื่อ",
+    "storageUsage": "พื้นที่จัดเก็บ",
+    "storageUnlimited": "พื้นที่ไม่จำกัด",
+    "usedLabel": "ใช้ไป: {used}",
+    "used": "ใช้ไป",
+    "quota": "โควต้า",
+    "remaining": "คงเหลือ",
+    "storageAlmostFull": "พื้นที่ใกล้เต็ม",
+    "storageWarning": "คุณมีพื้นที่เหลือ {remaining} จาก {quota} กรุณาลบไฟล์แนบที่ไม่ได้ใช้เพื่อเพิ่มพื้นที่ว่าง",
+    "dismiss": "ปิด"
   },
   "todos": {
     "title": "รายการที่ต้องทำของฉัน",
@@ -137,7 +168,8 @@
     "colorModeTitle": "โหมดสี: {mode}",
     "lightMode": "โหมดสว่าง",
     "darkMode": "โหมดมืด",
-    "systemMode": "โหมดตามระบบ"
+    "systemMode": "โหมดตามระบบ",
+    "toggleLanguage": "เปลี่ยนภาษา"
   },
   "ThemeGallery": {
     "title": "แกลเลอรีธีม",
@@ -236,7 +268,9 @@
       "userRejected": "ปฏิเสธผู้ใช้สำเร็จ ได้ส่งอีเมลแจ้งเตือนแล้ว",
       "userActivated": "เปิดใช้งานผู้ใช้สำเร็จ",
       "userDeactivated": "ปิดใช้งานผู้ใช้สำเร็จ",
-      "searchPlaceholder": "ค้นหาด้วยอีเมล..."
+      "searchPlaceholder": "ค้นหาด้วยอีเมล...",
+      "userRoleAdmin": "ผู้ดูแลระบบ",
+      "userRoleUser": "ผู้ใช้"
     },
     "queues": {
       "title": "จัดการคิว",
@@ -261,7 +295,16 @@
       "jobCancelled": "งานถูกยกเลิกแล้ว",
       "allRetried": "งานที่ล้มเหลวทั้งหมดถูกส่งไปลองใหม่แล้ว",
       "refresh": "รีเฟรช",
-      "autoRefresh": "รีเฟรชอัตโนมัติ"
+      "autoRefresh": "รีเฟรชอัตโนมัติ",
+      "queueTodoProcessing": "ประมวลผลรายการ",
+      "queueEmailJobs": "อีเมล",
+      "queueExportJobs": "ส่งออก",
+      "loadingJobs": "กำลังโหลดงาน...",
+      "noJobsForStatus": "ไม่มีงานสถานะ {status} ในคิวนี้",
+      "noJobsForQueue": "ไม่มีงานในสถานะใดๆ สำหรับคิวนี้",
+      "failedToLoadStats": "ไม่สามารถโหลดสถิติคิวได้",
+      "jobTotal": "รวม {total} งาน",
+      "lastUpdated": "อัปเดตล่าสุด: {time}"
     },
     "auditLog": {
       "title": "บันทึกการตรวจสอบ",
@@ -283,7 +326,12 @@
       "next": "ถัดไป",
       "page": "หน้า {current} จาก {total}",
       "expandDetails": "คลิกเพื่อดูรายละเอียด",
-      "refresh": "รีเฟรช"
+      "refresh": "รีเฟรช",
+      "applyFilters": "ใช้ตัวกรอง",
+      "actionPlaceholder": "เช่น admin.action",
+      "actorPlaceholder": "ค้นหาอีเมลผู้กระทำ...",
+      "noDetails": "ไม่มีรายละเอียด",
+      "pageInfo": "หน้า {current} จาก {total} ({totalEntries} รายการ)"
     },
     "system": {
       "title": "สุขภาพระบบ",
@@ -306,7 +354,10 @@
       "stalledJobs": "พบงานที่ค้าง",
       "noStalledJobs": "ไม่มีงานที่ค้าง",
       "refresh": "รีเฟรช",
-      "lastChecked": "ตรวจสอบล่าสุด: {time}"
+      "lastChecked": "ตรวจสอบล่าสุด: {time}",
+      "latencyMs": "เวลาแฝง: {latency}ms",
+      "queueDescription": "จำนวนงานต่อคิว",
+      "notAvailable": "N/A"
     }
   },
   "email": {

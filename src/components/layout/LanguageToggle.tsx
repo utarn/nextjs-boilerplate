@@ -1,6 +1,6 @@
 'use client'
 
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,9 +15,22 @@ export function LanguageToggle() {
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
+  const t = useTranslations('Navbar')
+  const lang = useTranslations('language')
 
-  const switchLocale = (newLocale: string) => {
+  const switchLocale = async (newLocale: string) => {
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`
+
+    // Sync locale to database if user is authenticated
+    try {
+      await fetch('/api/user/locale', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ locale: newLocale }),
+      })
+    } catch {
+      // Non-critical: cookie is already set, locale will work for this session
+    }
 
     // Remove current locale from path
     const pathWithoutLocale = pathname.replace(/^\/[^/]+/, '')
@@ -29,7 +42,7 @@ export function LanguageToggle() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
           <Globe className="h-5 w-5" />
-          <span className="sr-only">Toggle language</span>
+          <span className="sr-only">{t('toggleLanguage')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -37,13 +50,13 @@ export function LanguageToggle() {
           onClick={() => switchLocale('en')}
           className={locale === 'en' ? 'bg-accent' : ''}
         >
-          English
+          {lang('en')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => switchLocale('th')}
           className={locale === 'th' ? 'bg-accent' : ''}
         >
-          ไทย
+          {lang('th')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

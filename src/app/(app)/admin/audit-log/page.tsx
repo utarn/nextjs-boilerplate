@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -28,6 +29,7 @@ interface AuditResponse {
 }
 
 export default function AuditLogPage() {
+  const t = useTranslations('Admin.auditLog')
   const [data, setData] = useState<AuditResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,15 +54,15 @@ export default function AuditLogPage() {
       if (dateTo) params.set('dateTo', dateTo)
 
       const res = await fetch(`/api/admin/audit-log?${params}`)
-      if (!res.ok) throw new Error('Failed to fetch audit log')
+      if (!res.ok) throw new Error(t('errorLoading'))
       const json = await res.json()
       setData(json)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load audit log')
+      setError(err instanceof Error ? err.message : t('errorLoading'))
     } finally {
       setLoading(false)
     }
-  }, [page, actionFilter, actorFilter, dateFrom, dateTo])
+  }, [page, actionFilter, actorFilter, dateFrom, dateTo, t])
 
   useEffect(() => {
     fetchLogs()
@@ -87,12 +89,12 @@ export default function AuditLogPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Audit Log</h1>
-          <p className="text-muted-foreground">View and filter system audit trail</p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchLogs} disabled={loading}>
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
+          {t('refresh')}
         </Button>
       </div>
 
@@ -101,23 +103,23 @@ export default function AuditLogPage() {
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="text-sm font-medium mb-1 block">Filter by Action</label>
+              <label className="text-sm font-medium mb-1 block">{t('filterByAction')}</label>
               <Input
-                placeholder="e.g. admin.action"
+                placeholder={t('actionPlaceholder')}
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value)}
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Filter by Actor Email</label>
+              <label className="text-sm font-medium mb-1 block">{t('filterByActor')}</label>
               <Input
-                placeholder="Search actor email..."
+                placeholder={t('actorPlaceholder')}
                 value={actorFilter}
                 onChange={(e) => setActorFilter(e.target.value)}
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">From</label>
+              <label className="text-sm font-medium mb-1 block">{t('dateFrom')}</label>
               <Input
                 type="date"
                 value={dateFrom}
@@ -125,7 +127,7 @@ export default function AuditLogPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">To</label>
+              <label className="text-sm font-medium mb-1 block">{t('dateTo')}</label>
               <Input
                 type="date"
                 value={dateTo}
@@ -134,7 +136,7 @@ export default function AuditLogPage() {
             </div>
           </div>
           <Button className="mt-4" size="sm" onClick={handleFilter}>
-            Apply Filters
+            {t('applyFilters')}
           </Button>
         </CardContent>
       </Card>
@@ -155,7 +157,7 @@ export default function AuditLogPage() {
               <p className="text-destructive mb-4">{error}</p>
               <Button variant="outline" onClick={fetchLogs}>
                 <RefreshCw className="h-4 w-4 mr-2" />
-                Retry
+                {t('refresh')}
               </Button>
             </div>
           )}
@@ -163,7 +165,7 @@ export default function AuditLogPage() {
           {!loading && !error && data && data.logs.length === 0 && (
             <div className="p-12 text-center">
               <ScrollText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No audit entries found</p>
+              <p className="text-muted-foreground">{t('noEntries')}</p>
             </div>
           )}
 
@@ -173,11 +175,11 @@ export default function AuditLogPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-8" />
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>Actor</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Target Type</TableHead>
-                    <TableHead>Target ID</TableHead>
+                    <TableHead>{t('timestamp')}</TableHead>
+                    <TableHead>{t('actor')}</TableHead>
+                    <TableHead>{t('action')}</TableHead>
+                    <TableHead>{t('target')}</TableHead>
+                    <TableHead>{t('details')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -207,23 +209,29 @@ export default function AuditLogPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm">
-                          {entry.entityType || '-'}
+                          {entry.entityType || entry.entityId || '-'}
                         </TableCell>
                         <TableCell className="text-xs font-mono max-w-[120px] truncate">
-                          {entry.entityId || '-'}
+                          {entry.details ? (
+                            <span className="cursor-pointer" onClick={() => toggleExpand(entry.id)}>
+                              {t('expandDetails')}
+                            </span>
+                          ) : (
+                            '-'
+                          )}
                         </TableCell>
                       </TableRow>
                       {expandedRow === entry.id && (
                         <TableRow key={`${entry.id}-details`}>
                           <TableCell colSpan={6} className="bg-muted/30 p-4">
                             <div className="space-y-2">
-                              <h4 className="text-sm font-semibold">Details</h4>
+                              <h4 className="text-sm font-semibold">{t('details')}</h4>
                               {entry.details ? (
                                 <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto max-h-64 overflow-y-auto">
                                   {JSON.stringify(entry.details, null, 2)}
                                 </pre>
                               ) : (
-                                <p className="text-sm text-muted-foreground">No details available</p>
+                                <p className="text-sm text-muted-foreground">{t('noDetails')}</p>
                               )}
                             </div>
                           </TableCell>
@@ -242,7 +250,7 @@ export default function AuditLogPage() {
       {data && data.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Page {data.page} of {data.totalPages} ({data.total} entries)
+            {t('pageInfo', { current: data.page, total: data.totalPages, totalEntries: data.total })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -252,7 +260,7 @@ export default function AuditLogPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
+              {t('previous')}
             </Button>
             <Button
               variant="outline"
@@ -260,7 +268,7 @@ export default function AuditLogPage() {
               disabled={page >= data.totalPages}
               onClick={() => setPage((p) => p + 1)}
             >
-              Next
+              {t('next')}
               <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           </div>

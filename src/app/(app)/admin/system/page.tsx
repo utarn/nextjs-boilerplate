@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -90,15 +91,15 @@ function LoadingSkeleton() {
   )
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+function ErrorState({ message, onRetry, t }: { message: string; onRetry: () => void; t: (key: string) => string }) {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">System Health</h1>
+      <h1 className="text-3xl font-bold">{t('title')}</h1>
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-12">
           <p className="text-destructive text-lg">{message}</p>
           <Button onClick={onRetry} variant="outline">
-            Retry
+            {t('retry')}
           </Button>
         </CardContent>
       </Card>
@@ -109,9 +110,11 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 function HealthCard({
   title,
   result,
+  t,
 }: {
   title: string
   result: HealthCheckResult
+  t: (key: string, values?: Record<string, string | number>) => string
 }) {
   return (
     <Card>
@@ -122,7 +125,7 @@ function HealthCard({
       <CardContent>
         <div className="text-2xl font-bold capitalize">{result.status}</div>
         <p className="text-xs text-muted-foreground">
-          Latency: {result.latency}ms
+          {t('latencyMs', { latency: result.latency })}
         </p>
         {result.error && (
           <p className="text-xs text-destructive mt-1 truncate" title={result.error}>
@@ -135,6 +138,9 @@ function HealthCard({
 }
 
 export default function SystemHealthPage() {
+  const t = useTranslations('Admin.system')
+  const tq = useTranslations('Admin.queues')
+  const tCommon = useTranslations('common')
   const [data, setData] = useState<HealthData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -188,10 +194,10 @@ export default function SystemHealthPage() {
 
   // Error state
   if (error) {
-    return <ErrorState message={error} onRetry={fetchHealth} />
+    return <ErrorState message={error} onRetry={fetchHealth} t={t} />
   }
 
-  // Empty guard (data should never be null after loading completes without error)
+  // Empty guard
   if (!data) {
     return null
   }
@@ -201,54 +207,54 @@ export default function SystemHealthPage() {
       {/* Header with overall status */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold">System Health</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <Badge variant={badgeVariant(data.status)} className="capitalize">
-            {data.status}
+            {t(data.status)}
           </Badge>
         </div>
         <Button onClick={fetchHealth} variant="outline" size="sm">
-          Refresh
+          {t('refresh')}
         </Button>
       </div>
 
       {/* Database and Redis health cards */}
       <div className="grid gap-6 md:grid-cols-2">
-        <HealthCard title="Database" result={data.database} />
-        <HealthCard title="Redis" result={data.redis} />
+        <HealthCard title={t('database')} result={data.database} t={t} />
+        <HealthCard title={t('redis')} result={data.redis} t={t} />
       </div>
 
       {/* Queue health table */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Queue Health</CardTitle>
+            <CardTitle>{t('queueHealth')}</CardTitle>
             {data.hasStalledJobs && (
-              <Badge variant="destructive">Stalled Jobs Detected</Badge>
+              <Badge variant="destructive">{t('stalledJobs')}</Badge>
             )}
           </div>
-          <CardDescription>Job counts per queue</CardDescription>
+          <CardDescription>{t('queueDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Queue</TableHead>
-                <TableHead>Waiting</TableHead>
-                <TableHead>Active</TableHead>
-                <TableHead>Completed</TableHead>
-                <TableHead>Failed</TableHead>
-                <TableHead>Delayed</TableHead>
+                <TableHead>{tq('name')}</TableHead>
+                <TableHead>{t('waiting')}</TableHead>
+                <TableHead>{t('active')}</TableHead>
+                <TableHead>{t('completed')}</TableHead>
+                <TableHead>{t('failed')}</TableHead>
+                <TableHead>{t('delayed')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {Object.entries(data.queues).map(([name, counts]) => (
                 <TableRow key={name}>
                   <TableCell className="font-medium">{name}</TableCell>
-                  <TableCell>{counts?.waiting ?? 'N/A'}</TableCell>
-                  <TableCell>{counts?.active ?? 'N/A'}</TableCell>
-                  <TableCell>{counts?.completed ?? 'N/A'}</TableCell>
-                  <TableCell>{counts?.failed ?? 'N/A'}</TableCell>
-                  <TableCell>{counts?.delayed ?? 'N/A'}</TableCell>
+                  <TableCell>{counts?.waiting ?? t('notAvailable')}</TableCell>
+                  <TableCell>{counts?.active ?? t('notAvailable')}</TableCell>
+                  <TableCell>{counts?.completed ?? t('notAvailable')}</TableCell>
+                  <TableCell>{counts?.failed ?? t('notAvailable')}</TableCell>
+                  <TableCell>{counts?.delayed ?? t('notAvailable')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -259,12 +265,12 @@ export default function SystemHealthPage() {
       {/* App version card */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Application Version</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('appVersion')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-lg font-mono">{data.appVersion}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Last checked: {new Date(data.timestamp).toLocaleString()}
+            {t('lastChecked', { time: new Date(data.timestamp).toLocaleString() })}
           </p>
         </CardContent>
       </Card>
