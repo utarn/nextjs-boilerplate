@@ -46,6 +46,7 @@ export type WebUserMinAggregateOutputType = {
   emailVerifiedAt: Date | null
   theme: string | null
   colorMode: string | null
+  locale: string | null
   storageUsedBytes: bigint | null
   storageQuotaBytes: bigint | null
   createdAt: Date | null
@@ -62,6 +63,7 @@ export type WebUserMaxAggregateOutputType = {
   emailVerifiedAt: Date | null
   theme: string | null
   colorMode: string | null
+  locale: string | null
   storageUsedBytes: bigint | null
   storageQuotaBytes: bigint | null
   createdAt: Date | null
@@ -78,6 +80,7 @@ export type WebUserCountAggregateOutputType = {
   emailVerifiedAt: number
   theme: number
   colorMode: number
+  locale: number
   storageUsedBytes: number
   storageQuotaBytes: number
   createdAt: number
@@ -106,6 +109,7 @@ export type WebUserMinAggregateInputType = {
   emailVerifiedAt?: true
   theme?: true
   colorMode?: true
+  locale?: true
   storageUsedBytes?: true
   storageQuotaBytes?: true
   createdAt?: true
@@ -122,6 +126,7 @@ export type WebUserMaxAggregateInputType = {
   emailVerifiedAt?: true
   theme?: true
   colorMode?: true
+  locale?: true
   storageUsedBytes?: true
   storageQuotaBytes?: true
   createdAt?: true
@@ -138,6 +143,7 @@ export type WebUserCountAggregateInputType = {
   emailVerifiedAt?: true
   theme?: true
   colorMode?: true
+  locale?: true
   storageUsedBytes?: true
   storageQuotaBytes?: true
   createdAt?: true
@@ -241,6 +247,7 @@ export type WebUserGroupByOutputType = {
   emailVerifiedAt: Date | null
   theme: string | null
   colorMode: string | null
+  locale: string | null
   storageUsedBytes: bigint
   storageQuotaBytes: bigint
   createdAt: Date
@@ -280,6 +287,7 @@ export type WebUserWhereInput = {
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"WebUser"> | Date | string | null
   theme?: Prisma.StringNullableFilter<"WebUser"> | string | null
   colorMode?: Prisma.StringNullableFilter<"WebUser"> | string | null
+  locale?: Prisma.StringNullableFilter<"WebUser"> | string | null
   storageUsedBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
   storageQuotaBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
   createdAt?: Prisma.DateTimeFilter<"WebUser"> | Date | string
@@ -298,6 +306,7 @@ export type WebUserOrderByWithRelationInput = {
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   theme?: Prisma.SortOrderInput | Prisma.SortOrder
   colorMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  locale?: Prisma.SortOrderInput | Prisma.SortOrder
   storageUsedBytes?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -319,6 +328,7 @@ export type WebUserWhereUniqueInput = Prisma.AtLeast<{
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"WebUser"> | Date | string | null
   theme?: Prisma.StringNullableFilter<"WebUser"> | string | null
   colorMode?: Prisma.StringNullableFilter<"WebUser"> | string | null
+  locale?: Prisma.StringNullableFilter<"WebUser"> | string | null
   storageUsedBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
   storageQuotaBytes?: Prisma.BigIntFilter<"WebUser"> | bigint | number
   createdAt?: Prisma.DateTimeFilter<"WebUser"> | Date | string
@@ -337,6 +347,7 @@ export type WebUserOrderByWithAggregationInput = {
   emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   theme?: Prisma.SortOrderInput | Prisma.SortOrder
   colorMode?: Prisma.SortOrderInput | Prisma.SortOrder
+  locale?: Prisma.SortOrderInput | Prisma.SortOrder
   storageUsedBytes?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -361,6 +372,7 @@ export type WebUserScalarWhereWithAggregatesInput = {
   emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"WebUser"> | Date | string | null
   theme?: Prisma.StringNullableWithAggregatesFilter<"WebUser"> | string | null
   colorMode?: Prisma.StringNullableWithAggregatesFilter<"WebUser"> | string | null
+  locale?: Prisma.StringNullableWithAggregatesFilter<"WebUser"> | string | null
   storageUsedBytes?: Prisma.BigIntWithAggregatesFilter<"WebUser"> | bigint | number
   storageQuotaBytes?: Prisma.BigIntWithAggregatesFilter<"WebUser"> | bigint | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"WebUser"> | Date | string
@@ -377,6 +389,7 @@ export type WebUserCreateInput = {
   emailVerifiedAt?: Date | string | null
   theme?: string | null
   colorMode?: string | null
+  locale?: string | null
   storageUsedBytes?: bigint | number
   storageQuotaBytes?: bigint | number
   createdAt?: Date | string
@@ -395,6 +408,7 @@ export type WebUserUncheckedCreateInput = {
   emailVerifiedAt?: Date | string | null
   theme?: string | null
   colorMode?: string | null
+  locale?: string | null
   storageUsedBytes?: bigint | number
   storageQuotaBytes?: bigint | number
   createdAt?: Date | string
@@ -413,6 +427,7 @@ export type WebUserUpdateInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -431,6 +446,7 @@ export type WebUserUncheckedUpdateInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -449,6 +465,7 @@ export type WebUserCreateManyInput = {
   emailVerifiedAt?: Date | string | null
   theme?: string | null
   colorMode?: string | null
+  locale?: string | null
   storageUsedBytes?: bigint | number
   storageQuotaBytes?: bigint | number
   createdAt?: Date | string
@@ -465,6 +482,7 @@ export type WebUserUpdateManyMutationInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -481,6 +499,7 @@ export type WebUserUncheckedUpdateManyInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -497,6 +516,7 @@ export type WebUserCountOrderByAggregateInput = {
   emailVerifiedAt?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   colorMode?: Prisma.SortOrder
+  locale?: Prisma.SortOrder
   storageUsedBytes?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -518,6 +538,7 @@ export type WebUserMaxOrderByAggregateInput = {
   emailVerifiedAt?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   colorMode?: Prisma.SortOrder
+  locale?: Prisma.SortOrder
   storageUsedBytes?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -534,6 +555,7 @@ export type WebUserMinOrderByAggregateInput = {
   emailVerifiedAt?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   colorMode?: Prisma.SortOrder
+  locale?: Prisma.SortOrder
   storageUsedBytes?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -627,6 +649,7 @@ export type WebUserCreateWithoutAuditLogsInput = {
   emailVerifiedAt?: Date | string | null
   theme?: string | null
   colorMode?: string | null
+  locale?: string | null
   storageUsedBytes?: bigint | number
   storageQuotaBytes?: bigint | number
   createdAt?: Date | string
@@ -644,6 +667,7 @@ export type WebUserUncheckedCreateWithoutAuditLogsInput = {
   emailVerifiedAt?: Date | string | null
   theme?: string | null
   colorMode?: string | null
+  locale?: string | null
   storageUsedBytes?: bigint | number
   storageQuotaBytes?: bigint | number
   createdAt?: Date | string
@@ -677,6 +701,7 @@ export type WebUserUpdateWithoutAuditLogsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -694,6 +719,7 @@ export type WebUserUncheckedUpdateWithoutAuditLogsInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -711,6 +737,7 @@ export type WebUserCreateWithoutTodosInput = {
   emailVerifiedAt?: Date | string | null
   theme?: string | null
   colorMode?: string | null
+  locale?: string | null
   storageUsedBytes?: bigint | number
   storageQuotaBytes?: bigint | number
   createdAt?: Date | string
@@ -728,6 +755,7 @@ export type WebUserUncheckedCreateWithoutTodosInput = {
   emailVerifiedAt?: Date | string | null
   theme?: string | null
   colorMode?: string | null
+  locale?: string | null
   storageUsedBytes?: bigint | number
   storageQuotaBytes?: bigint | number
   createdAt?: Date | string
@@ -761,6 +789,7 @@ export type WebUserUpdateWithoutTodosInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -778,6 +807,7 @@ export type WebUserUncheckedUpdateWithoutTodosInput = {
   emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   theme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   colorMode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   storageUsedBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -835,6 +865,7 @@ export type WebUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   emailVerifiedAt?: boolean
   theme?: boolean
   colorMode?: boolean
+  locale?: boolean
   storageUsedBytes?: boolean
   storageQuotaBytes?: boolean
   createdAt?: boolean
@@ -854,6 +885,7 @@ export type WebUserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   emailVerifiedAt?: boolean
   theme?: boolean
   colorMode?: boolean
+  locale?: boolean
   storageUsedBytes?: boolean
   storageQuotaBytes?: boolean
   createdAt?: boolean
@@ -870,6 +902,7 @@ export type WebUserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   emailVerifiedAt?: boolean
   theme?: boolean
   colorMode?: boolean
+  locale?: boolean
   storageUsedBytes?: boolean
   storageQuotaBytes?: boolean
   createdAt?: boolean
@@ -886,13 +919,14 @@ export type WebUserSelectScalar = {
   emailVerifiedAt?: boolean
   theme?: boolean
   colorMode?: boolean
+  locale?: boolean
   storageUsedBytes?: boolean
   storageQuotaBytes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type WebUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "displayName" | "role" | "status" | "googleId" | "emailVerifiedAt" | "theme" | "colorMode" | "storageUsedBytes" | "storageQuotaBytes" | "createdAt" | "updatedAt", ExtArgs["result"]["webUser"]>
+export type WebUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "displayName" | "role" | "status" | "googleId" | "emailVerifiedAt" | "theme" | "colorMode" | "locale" | "storageUsedBytes" | "storageQuotaBytes" | "createdAt" | "updatedAt", ExtArgs["result"]["webUser"]>
 export type WebUserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auditLogs?: boolean | Prisma.WebUser$auditLogsArgs<ExtArgs>
   todos?: boolean | Prisma.WebUser$todosArgs<ExtArgs>
@@ -917,6 +951,7 @@ export type $WebUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     emailVerifiedAt: Date | null
     theme: string | null
     colorMode: string | null
+    locale: string | null
     storageUsedBytes: bigint
     storageQuotaBytes: bigint
     createdAt: Date
@@ -1355,6 +1390,7 @@ export interface WebUserFieldRefs {
   readonly emailVerifiedAt: Prisma.FieldRef<"WebUser", 'DateTime'>
   readonly theme: Prisma.FieldRef<"WebUser", 'String'>
   readonly colorMode: Prisma.FieldRef<"WebUser", 'String'>
+  readonly locale: Prisma.FieldRef<"WebUser", 'String'>
   readonly storageUsedBytes: Prisma.FieldRef<"WebUser", 'BigInt'>
   readonly storageQuotaBytes: Prisma.FieldRef<"WebUser", 'BigInt'>
   readonly createdAt: Prisma.FieldRef<"WebUser", 'DateTime'>

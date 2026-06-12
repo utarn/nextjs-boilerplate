@@ -7,6 +7,7 @@ import { LanguageToggle } from '@/components/layout/LanguageToggle'
 
 export default function SettingsPage() {
   const t = useTranslations('nav')
+  const ts = useTranslations('settings')
 
   return (
     <div>
@@ -14,7 +15,7 @@ export default function SettingsPage() {
       <div className="space-y-4 max-w-md">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Theme</CardTitle>
+            <CardTitle className="text-lg">{ts('theme')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ThemePickerDropdown />
@@ -22,7 +23,7 @@ export default function SettingsPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Language</CardTitle>
+            <CardTitle className="text-lg">{ts('language')}</CardTitle>
           </CardHeader>
           <CardContent>
             <LanguageToggle />

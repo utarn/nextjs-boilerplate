@@ -40,10 +40,10 @@ export function AppLayout({ children, user, defaultTheme, defaultColorMode }: Ap
   // Admin-only links
   if (user.role === 'ADMIN') {
     navItems.push(
-      { href: '/admin/users', label: 'Users', icon: Users },
-      { href: '/admin/queues', label: 'Queues', icon: ListOrdered },
-      { href: '/admin/audit-log', label: 'Audit Log', icon: ScrollText },
-      { href: '/admin/system', label: 'System', icon: Activity },
+      { href: '/admin/users', label: t('users'), icon: Users },
+      { href: '/admin/queues', label: t('queues'), icon: ListOrdered },
+      { href: '/admin/audit-log', label: t('auditLog'), icon: ScrollText },
+      { href: '/admin/system', label: t('system'), icon: Activity },
     )
   }
 

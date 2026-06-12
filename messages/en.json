@@ -14,7 +14,13 @@
     "settings": "Settings",
     "back": "Back",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "unlimited": "Unlimited",
+    "notAvailable": "N/A",
+    "retry": "Retry",
+    "status": "Status",
+    "processing": "Processed",
+    "finished": "Finished"
   },
   "Login": {
     "title": "Sign In",
@@ -51,7 +57,32 @@
     "profile": "Profile",
     "settings": "Settings",
     "admin": "Admin",
+    "users": "Users",
+    "queues": "Queues",
+    "auditLog": "Audit Log",
+    "system": "System",
     "logout": "Logout"
+  },
+  "settings": {
+    "theme": "Theme",
+    "language": "Language"
+  },
+  "profile": {
+    "title": "Profile",
+    "loading": "Loading...",
+    "errorLoad": "Failed to load profile",
+    "email": "Email",
+    "role": "Role",
+    "joined": "Joined",
+    "storageUsage": "Storage Usage",
+    "storageUnlimited": "Storage Unlimited",
+    "usedLabel": "Used: {used}",
+    "used": "Used",
+    "quota": "Quota",
+    "remaining": "Remaining",
+    "storageAlmostFull": "Storage Almost Full",
+    "storageWarning": "You have {remaining} of {quota} remaining. Free up space by deleting unused file attachments.",
+    "dismiss": "Dismiss"
   },
   "todos": {
     "title": "My Todos",
@@ -137,7 +168,8 @@
     "colorModeTitle": "Color mode: {mode}",
     "lightMode": "light mode",
     "darkMode": "dark mode",
-    "systemMode": "system mode"
+    "systemMode": "system mode",
+    "toggleLanguage": "Toggle language"
   },
   "ThemeGallery": {
     "title": "Theme Gallery",
@@ -236,7 +268,9 @@
       "userRejected": "User rejected successfully. An email notification has been sent.",
       "userActivated": "User activated successfully.",
       "userDeactivated": "User deactivated successfully.",
-      "searchPlaceholder": "Search by email..."
+      "searchPlaceholder": "Search by email...",
+      "userRoleAdmin": "Admin",
+      "userRoleUser": "User"
     },
     "queues": {
       "title": "Queue Management",
@@ -261,7 +295,16 @@
       "jobCancelled": "Job cancelled",
       "allRetried": "All failed jobs queued for retry",
       "refresh": "Refresh",
-      "autoRefresh": "Auto-refresh"
+      "autoRefresh": "Auto-refresh",
+      "queueTodoProcessing": "Todo Processing",
+      "queueEmailJobs": "Email Jobs",
+      "queueExportJobs": "Export Jobs",
+      "loadingJobs": "Loading jobs...",
+      "noJobsForStatus": "There are no {status} jobs for this queue.",
+      "noJobsForQueue": "There are no jobs in any status for this queue.",
+      "failedToLoadStats": "Failed to load queue stats",
+      "jobTotal": "{total} job(s) total",
+      "lastUpdated": "Last updated: {time}"
     },
     "auditLog": {
       "title": "Audit Log",
@@ -283,7 +326,12 @@
       "next": "Next",
       "page": "Page {current} of {total}",
       "expandDetails": "Click to view details",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "applyFilters": "Apply Filters",
+      "actionPlaceholder": "e.g. admin.action",
+      "actorPlaceholder": "Search actor email...",
+      "noDetails": "No details available",
+      "pageInfo": "Page {current} of {total} ({totalEntries} entries)"
     },
     "system": {
       "title": "System Health",
@@ -306,7 +354,10 @@
       "stalledJobs": "Stalled Jobs Detected",
       "noStalledJobs": "No Stalled Jobs",
       "refresh": "Refresh",
-      "lastChecked": "Last checked: {time}"
+      "lastChecked": "Last checked: {time}",
+      "latencyMs": "Latency: {latency}ms",
+      "queueDescription": "Job counts per queue",
+      "notAvailable": "N/A"
     }
   },
   "email": {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -57,30 +58,26 @@ interface PaginatedJobs {
 const VALID_QUEUES = ['todo-processing', 'email-jobs', 'export-jobs'] as const
 type ValidQueueName = (typeof VALID_QUEUES)[number]
 
-const QUEUE_LABELS: Record<string, string> = {
-  'todo-processing': 'Todo Processing',
-  'email-jobs': 'Email Jobs',
-  'export-jobs': 'Export Jobs',
-}
-
 const STATUS_OPTIONS = [
-  { value: 'all', label: 'All' },
-  { value: 'failed', label: 'Failed' },
-  { value: 'waiting', label: 'Waiting' },
-  { value: 'active', label: 'Active' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'delayed', label: 'Delayed' },
+  'all',
+  'failed',
+  'waiting',
+  'active',
+  'completed',
+  'delayed',
 ] as const
 
-type StatusFilter = (typeof STATUS_OPTIONS)[number]['value']
+type StatusFilter = (typeof STATUS_OPTIONS)[number]
 
-const STAT_CARDS = [
-  { key: 'active', label: 'Active', colorClass: 'text-blue-500' },
-  { key: 'waiting', label: 'Waiting', colorClass: 'text-yellow-500' },
-  { key: 'delayed', label: 'Delayed', colorClass: 'text-orange-500' },
-  { key: 'completed', label: 'Completed', colorClass: 'text-green-500' },
-  { key: 'failed', label: 'Failed', colorClass: 'text-red-500' },
-] as const
+const STAT_CARD_KEYS = ['active', 'waiting', 'delayed', 'completed', 'failed'] as const
+
+const STAT_CARD_COLORS: Record<string, string> = {
+  active: 'text-blue-500',
+  waiting: 'text-yellow-500',
+  delayed: 'text-orange-500',
+  completed: 'text-green-500',
+  failed: 'text-red-500',
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -105,6 +102,8 @@ function formatDuration(ts: number | undefined): string {
 // ---------------------------------------------------------------------------
 
 export default function QueuesPage() {
+  const t = useTranslations('Admin.queues')
+  const tCommon = useTranslations('common')
   // Stats for all queues (no queue param)
   const [stats, setStats] = useState<QueueStats | null>(null)
   const [statsLoading, setStatsLoading] = useState(true)
@@ -128,6 +127,12 @@ export default function QueuesPage() {
   const [refreshing, setRefreshing] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const queueLabels: Record<string, string> = {
+    'todo-processing': t('queueTodoProcessing'),
+    'email-jobs': t('queueEmailJobs'),
+    'export-jobs': t('queueExportJobs'),
+  }
+
   // -----------------------------------------------------------------------
   // Data fetching
   // -----------------------------------------------------------------------
@@ -136,17 +141,17 @@ export default function QueuesPage() {
     try {
       const res = await fetch('/api/admin/queues')
       if (!res.ok) {
-        throw new Error(`Failed to fetch stats (${res.status})`)
+        throw new Error(t('errorLoading'))
       }
       const data = await res.json()
       setStats(data.queues)
       setStatsError(null)
     } catch (err) {
-      setStatsError(err instanceof Error ? err.message : 'Failed to load queue stats')
+      setStatsError(err instanceof Error ? err.message : t('failedToLoadStats'))
     } finally {
       setStatsLoading(false)
     }
-  }, [])
+  }, [t])
 
   const fetchJobs = useCallback(
     async (queue: string, status: string, page: number) => {
@@ -157,17 +162,17 @@ export default function QueuesPage() {
         const params = new URLSearchParams({ queue, status: effectiveStatus, page: String(page), limit: '20' })
         const res = await fetch(`/api/admin/queues?${params}`)
         if (!res.ok) {
-          throw new Error(`Failed to fetch jobs (${res.status})`)
+          throw new Error(t('errorLoading'))
         }
         const data: PaginatedJobs = await res.json()
         setJobsData(data)
       } catch (err) {
-        setJobsError(err instanceof Error ? err.message : 'Failed to load jobs')
+        setJobsError(err instanceof Error ? err.message : t('errorLoading'))
       } finally {
         setJobsLoading(false)
       }
     },
-    [],
+    [t],
   )
 
   // -----------------------------------------------------------------------
@@ -334,13 +339,14 @@ export default function QueuesPage() {
 
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
-        {STAT_CARDS.map(({ key, label, colorClass }) => {
-          const value = queueStats[key as keyof typeof queueStats] ?? 0
+        {STAT_CARD_KEYS.map((key) => {
+          const value = queueStats[key] ?? 0
+          const colorClass = STAT_CARD_COLORS[key] || ''
           return (
             <Card key={key} className="text-center">
               <CardContent className="pt-6">
                 <p className={`text-3xl font-bold ${colorClass}`}>{value}</p>
-                <p className="text-xs text-muted-foreground mt-1">{label}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t(key)}</p>
               </CardContent>
             </Card>
           )
@@ -352,14 +358,14 @@ export default function QueuesPage() {
   function renderStatusPills() {
     return (
       <div className="flex flex-wrap gap-2 mb-4">
-        {STATUS_OPTIONS.map(({ value, label }) => (
+        {STATUS_OPTIONS.map((value) => (
           <Button
             key={value}
             variant={statusFilter === value ? 'default' : 'outline'}
             size="sm"
             onClick={() => handleStatusFilterChange(value)}
           >
-            {label}
+            {value === 'all' ? t('all') : t(value)}
           </Button>
         ))}
       </div>
@@ -371,7 +377,7 @@ export default function QueuesPage() {
       return (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-muted-foreground">Loading jobs...</span>
+          <span className="ml-2 text-muted-foreground">{t('loadingJobs')}</span>
         </div>
       )
     }
@@ -380,7 +386,7 @@ export default function QueuesPage() {
       return (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{tCommon('error')}</AlertTitle>
           <AlertDescription>
             {jobsError}
             <Button
@@ -389,7 +395,7 @@ export default function QueuesPage() {
               className="ml-2"
               onClick={() => fetchJobs(activeTab, statusFilter, currentPage)}
             >
-              Retry
+              {tCommon('retry')}
             </Button>
           </AlertDescription>
         </Alert>
@@ -399,11 +405,11 @@ export default function QueuesPage() {
     if (!jobsData || jobsData.jobs.length === 0) {
       return (
         <div className="text-center py-12 text-muted-foreground">
-          <p className="text-lg">No jobs found</p>
+          <p className="text-lg">{t('noJobs')}</p>
           <p className="text-sm mt-1">
             {statusFilter === 'all'
-              ? 'There are no jobs in any status for this queue.'
-              : `There are no ${statusFilter} jobs for this queue.`}
+              ? t('noJobsForQueue')
+              : t('noJobsForStatus', { status: t(statusFilter) })}
           </p>
         </div>
       )
@@ -414,14 +420,14 @@ export default function QueuesPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="text-left py-3 px-2 font-medium text-muted-foreground">ID</th>
-              <th className="text-left py-3 px-2 font-medium text-muted-foreground">Name</th>
-              <th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th>
-              <th className="text-center py-3 px-2 font-medium text-muted-foreground">Attempts</th>
-              <th className="text-left py-3 px-2 font-medium text-muted-foreground">Created</th>
-              <th className="text-left py-3 px-2 font-medium text-muted-foreground">Processed</th>
-              <th className="text-left py-3 px-2 font-medium text-muted-foreground">Finished</th>
-              <th className="text-center py-3 px-2 font-medium text-muted-foreground">Actions</th>
+              <th className="text-left py-3 px-2 font-medium text-muted-foreground">{t('jobId')}</th>
+              <th className="text-left py-3 px-2 font-medium text-muted-foreground">{t('name')}</th>
+              <th className="text-left py-3 px-2 font-medium text-muted-foreground">{tCommon('status')}</th>
+              <th className="text-center py-3 px-2 font-medium text-muted-foreground">{t('attempts')}</th>
+              <th className="text-left py-3 px-2 font-medium text-muted-foreground">{t('timestamp')}</th>
+              <th className="text-left py-3 px-2 font-medium text-muted-foreground">{tCommon('processing')}</th>
+              <th className="text-left py-3 px-2 font-medium text-muted-foreground">{tCommon('finished')}</th>
+              <th className="text-center py-3 px-2 font-medium text-muted-foreground">{t('actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -464,7 +470,7 @@ export default function QueuesPage() {
                       ) : (
                         <RotateCcw className="h-3.5 w-3.5" />
                       )}
-                      <span className="sr-only sm:not-sr-only sm:ml-1.5 text-xs">Retry</span>
+                      <span className="sr-only sm:not-sr-only sm:ml-1.5 text-xs">{t('retry')}</span>
                     </Button>
                   )}
                   {(job.status === 'waiting' || job.status === 'delayed') && (
@@ -480,7 +486,7 @@ export default function QueuesPage() {
                       ) : (
                         <XCircle className="h-3.5 w-3.5" />
                       )}
-                      <span className="sr-only sm:not-sr-only sm:ml-1.5 text-xs">Cancel</span>
+                      <span className="sr-only sm:not-sr-only sm:ml-1.5 text-xs">{t('cancel')}</span>
                     </Button>
                   )}
                   {job.status !== 'failed' && job.status !== 'waiting' && job.status !== 'delayed' && (
@@ -503,7 +509,7 @@ export default function QueuesPage() {
     return (
       <div className="flex items-center justify-between mt-4">
         <p className="text-sm text-muted-foreground">
-          {total} job{total !== 1 ? 's' : ''} total
+          {t('jobTotal', { total })}
         </p>
         <div className="flex items-center gap-1">
           <Button
@@ -515,7 +521,6 @@ export default function QueuesPage() {
             <ChevronLeft className="h-4 w-4" />
           </Button>
           {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-            // Show pages around current page
             let pageNum: number
             if (totalPages <= 5) {
               pageNum = i + 1
@@ -559,20 +564,20 @@ export default function QueuesPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Queue Management</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
         </div>
         <div className="space-y-4">
           {VALID_QUEUES.map((name) => (
             <Card key={name}>
               <CardHeader>
-                <CardTitle className="text-lg">{QUEUE_LABELS[name]}</CardTitle>
+                <CardTitle className="text-lg">{queueLabels[name]}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                  {STAT_CARDS.map(({ key, label }) => (
+                  {STAT_CARD_KEYS.map((key) => (
                     <div key={key} className="text-center animate-pulse">
                       <div className="h-9 w-16 bg-muted rounded mx-auto" />
-                      <p className="text-xs text-muted-foreground mt-1">{label}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t(key)}</p>
                     </div>
                   ))}
                 </div>
@@ -592,11 +597,11 @@ export default function QueuesPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Queue Management</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
         </div>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Failed to load queue stats</AlertTitle>
+          <AlertTitle>{t('failedToLoadStats')}</AlertTitle>
           <AlertDescription>
             {statsError}
             <Button
@@ -605,7 +610,7 @@ export default function QueuesPage() {
               className="ml-2"
               onClick={fetchStats}
             >
-              Retry
+              {tCommon('retry')}
             </Button>
           </AlertDescription>
         </Alert>
@@ -621,11 +626,11 @@ export default function QueuesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h1 className="text-3xl font-bold">Queue Management</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <div className="flex items-center gap-3">
           {lastUpdated && (
             <span className="text-xs text-muted-foreground">
-              Last updated: {lastUpdated.toLocaleTimeString()}
+              {t('lastUpdated', { time: lastUpdated.toLocaleTimeString() })}
             </span>
           )}
           <Button
@@ -635,7 +640,7 @@ export default function QueuesPage() {
             disabled={refreshing}
           >
             <RefreshCw className={`h-4 w-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('refresh')}
           </Button>
         </div>
       </div>
@@ -645,7 +650,7 @@ export default function QueuesPage() {
         <TabsList className="w-full sm:w-auto">
           {VALID_QUEUES.map((name) => (
             <TabsTrigger key={name} value={name} className="flex-1 sm:flex-none">
-              {QUEUE_LABELS[name]}
+              {queueLabels[name]}
             </TabsTrigger>
           ))}
         </TabsList>

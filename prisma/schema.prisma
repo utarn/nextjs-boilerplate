@@ -42,6 +42,7 @@ model WebUser {
   emailVerifiedAt   DateTime?
   theme             String?
   colorMode         String?
+  locale            String?
   storageUsedBytes  BigInt    @default(0)
   storageQuotaBytes BigInt    @default(-1)
   createdAt         DateTime  @default(now())

@@ -84,6 +84,7 @@ export const WebUserScalarFieldEnum = {
   emailVerifiedAt: 'emailVerifiedAt',
   theme: 'theme',
   colorMode: 'colorMode',
+  locale: 'locale',
   storageUsedBytes: 'storageUsedBytes',
   storageQuotaBytes: 'storageQuotaBytes',
   createdAt: 'createdAt',
