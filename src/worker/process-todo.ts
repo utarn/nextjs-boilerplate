@@ -1,6 +1,6 @@
 import { Worker } from 'bullmq'
 import { getRedisConnection } from '@/lib/redis'
-import { TODO_PROCESSING_QUEUE, EMAIL_QUEUE, emailQueue, TodoProcessingJobData } from '@/lib/queue'
+import { TODO_PROCESSING_QUEUE, emailQueue, TodoProcessingJobData, EmailJobData } from '@/lib/queue'
 import { prisma } from '@/lib/prisma'
 import { eventBus } from '@/lib/event-bus'
 
@@ -118,40 +118,125 @@ async function handleOverdueTodos() {
     `[worker] Found ${overdueTodos.length} overdue todos for ${userGroups.size} user(s)`,
   )
 
-  // Enqueue one email per user with their overdue items
+  // Enqueue one branded email per user with their overdue items
   for (const [userId, todos] of userGroups) {
     const user = todos[0].user
-    const todoList = todos
-      .map((t) => `• ${t.title}${t.dueDate ? ` (due: ${t.dueDate.toLocaleDateString()})` : ''}`)
-      .join('\n')
-
+    const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Next.js Boilerplate'
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const overdueCount = todos.length
-    const subject = `⏰ ${overdueCount} overdue todo${overdueCount > 1 ? 's' : ''} on ${process.env.NEXT_PUBLIC_APP_NAME || 'Todo App'}`
 
-    const html = `
-      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
-        <h2 style="color: #dc2626;">Overdue Todo${overdueCount > 1 ? 's' : ''}</h2>
-        <p style="color: #555;">Hello ${user.displayName},</p>
-        <p style="color: #555;">
-          You have <strong>${overdueCount}</strong> overdue todo${overdueCount > 1 ? 's' : ''}:
-        </p>
-        <ul style="color: #333; line-height: 1.6;">
-          ${todos.map((t) => `<li>${t.title}${t.dueDate ? ` <span style="color: #888;">(due: ${t.dueDate.toLocaleDateString()})</span>` : ''}</li>`).join('')}
-        </ul>
-        <p style="margin-top: 20px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/todos"
-             style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 6px;">
-            View My Todos
-          </a>
-        </p>
-      </div>
+    const todoRows = todos
+      .map((t) => {
+        const dueLabel = t.dueDate
+          ? ` (due: ${t.dueDate.toLocaleDateString()})`
+          : ''
+        return `<tr><td style="padding: 6px 0; border-bottom: 1px solid #f0f0f0; color: #333333;">• ${t.title}${dueLabel}</td></tr>`
+      })
+      .join('')
+
+    const bodyHtml = `
+      <h2 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #dc2626;">
+        Overdue Todo${overdueCount > 1 ? 's' : ''}
+      </h2>
+      <p style="margin: 0 0 8px 0; color: #555555;">
+        Hello ${user.displayName},
+      </p>
+      <p style="margin: 0 0 16px 0; color: #555555;">
+        You have <strong>${overdueCount}</strong> overdue todo${overdueCount > 1 ? 's' : ''}:
+      </p>
+      <table style="margin: 12px 0; font-size: 14px;">
+        ${todoRows}
+      </table>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
+        <tr>
+          <td align="center" style="border-radius: 6px; background-color: #2563eb;">
+            <a
+              href="${appUrl}/todos"
+              style="
+                display: inline-block;
+                padding: 12px 28px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                font-size: 15px;
+                font-weight: 600;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 6px;
+                line-height: 1;
+              "
+            >
+              View My Todos
+            </a>
+          </td>
+        </tr>
+      </table>
     `
 
+    const todoListText = todos
+      .map((t) => {
+        const dueLabel = t.dueDate
+          ? ` (due: ${t.dueDate.toLocaleDateString()})`
+          : ''
+        return `- ${t.title}${dueLabel}`
+      })
+      .join('\n')
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overdue Todo${overdueCount > 1 ? 's' : ''}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f7;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f5f7;">
+    <tr>
+      <td align="center" style="padding: 32px 16px;">
+        <!-- Container -->
+        <table role="presentation" width="100%" style="max-width: 480px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 32px 32px 0 32px;">
+              <h1 style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700; color: #1a1a1a;">
+                ${appName}
+              </h1>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding: 16px 32px 24px 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #333333;">
+              ${bodyHtml}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 16px 32px 24px 32px; border-top: 1px solid #e8e8e8;">
+              <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.5; color: #999999;">
+                ${appName} &mdash; Your productivity platform
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+
+    const text =
+      `Hello ${user.displayName},\n\n` +
+      `You have ${overdueCount} overdue todo${overdueCount > 1 ? 's' : ''}:\n\n` +
+      `${todoListText}\n\n` +
+      `View My Todos: ${appUrl}/todos`
+
+    const subject = `${overdueCount} overdue todo${overdueCount > 1 ? 's' : ''} on ${appName}`
+
     await emailQueue.add('overdue-reminder', {
+      type: 'overdue-reminder',
       to: user.email,
       subject,
       html,
-    })
+      text,
+    } as EmailJobData)
 
     console.log(`[worker] Enqueued overdue reminder for ${user.email} (${overdueCount} todos)`)
   }

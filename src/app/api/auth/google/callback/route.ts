@@ -4,6 +4,7 @@ import { createAuthSession, appUrl } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { UserStatus, WebUserRole } from '@/generated/client'
 import { logAuditEvent, AUDIT_ACTIONS } from '@/lib/audit'
+import { sendNewUserNotificationToAdmins } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,6 +49,15 @@ export async function GET(request: NextRequest) {
           method: 'google_oauth',
           status: UserStatus.PENDING,
         },
+      })
+
+      // Notify all ADMIN users about the new signup (fire-and-forget via
+      // the email queue so SMTP failures don't crash the web server).
+      sendNewUserNotificationToAdmins({
+        userEmail: user.email,
+        userDisplayName: user.displayName,
+      }).catch((err) => {
+        console.error('[auth] Failed to notify admins about new user:', err)
       })
     } else if (!user.googleId) {
       // Update existing user with Google ID

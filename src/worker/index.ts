@@ -23,7 +23,7 @@ async function main() {
       'overdue-check',
       { todoId: '', action: 'overdue' },
       {
-        repeat: { every: 3600_000 }, // 1 hour
+        repeat: { every: 3_600_000 }, // 1 hour (was incorrectly 36 s)
         removeOnComplete: { count: 100 },
         removeOnFail: { count: 100 },
       },
