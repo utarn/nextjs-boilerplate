@@ -15,6 +15,23 @@ export { getRedisConnection }
 
 /**
  * Shared BullMQ queue instance for todo background processing.
+ *
+ * @example
+ * ```ts
+ * // Enqueue a todo processing job
+ * import { todoProcessingQueue, TodoProcessingJobData } from '@/lib/queue'
+ *
+ * await todoProcessingQueue.add('todo-created', {
+ *   todoId: '123',
+ *   action: 'created',
+ * } as TodoProcessingJobData)
+ *
+ * // Enqueue with custom options
+ * await todoProcessingQueue.add('todo-created', data, {
+ *   delay: 5000,       // wait 5 seconds
+ *   priority: 1,       // higher priority
+ * })
+ * ```
  */
 export const todoProcessingQueue = new Queue(TODO_PROCESSING_QUEUE, {
   connection: getRedisConnection(),
@@ -32,6 +49,20 @@ export const todoProcessingQueue = new Queue(TODO_PROCESSING_QUEUE, {
 /**
  * BullMQ queue instance for email jobs.
  * Uses 3 retry attempts with exponential backoff for reliability.
+ *
+ * @example
+ * ```ts
+ * // Enqueue an email job (typically from a worker or API route)
+ * import { emailQueue, EmailJobData } from '@/lib/queue'
+ *
+ * await emailQueue.add('overdue-reminder', {
+ *   type: 'overdue-reminder',
+ *   to: 'user@example.com',
+ *   subject: 'You have overdue todos',
+ *   html: '<p>Your todos are overdue</p>',
+ *   text: 'Your todos are overdue',
+ * } as EmailJobData)
+ * ```
  */
 export const emailQueue = new Queue(EMAIL_QUEUE, {
   connection: getRedisConnection(),

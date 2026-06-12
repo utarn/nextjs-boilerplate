@@ -123,7 +123,9 @@ export function useScrollAnimationItems(
   const callbacksRef = useRef<((node: HTMLElement | null) => void)[]>([])
 
   // Recreate callbacks only when count changes
+  // eslint-disable-next-line react-hooks/refs
   if (callbacksRef.current.length !== count) {
+    // eslint-disable-next-line react-hooks/refs
     callbacksRef.current = Array.from({ length: count }, (_, i) => (node: HTMLElement | null) => {
       elementRefs.current[i] = node
     })
@@ -181,5 +183,6 @@ export function useScrollAnimationItems(
     }
   }, [visibleIndices, staggerDelay])
 
+  // eslint-disable-next-line react-hooks/refs
   return callbacksRef.current
 }

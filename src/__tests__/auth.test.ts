@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateToken, verifyToken, JWTPayload } from '@/lib/auth'
+import { generateToken, verifyToken } from '@/lib/auth'
 
 describe('auth', () => {
   describe('generateToken/verifyToken', () => {

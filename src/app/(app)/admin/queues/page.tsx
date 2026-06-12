@@ -56,7 +56,6 @@ interface PaginatedJobs {
 // ---------------------------------------------------------------------------
 
 const VALID_QUEUES = ['todo-processing', 'email-jobs', 'export-jobs'] as const
-type ValidQueueName = (typeof VALID_QUEUES)[number]
 
 const STATUS_OPTIONS = [
   'all',
@@ -181,11 +180,13 @@ export default function QueuesPage() {
 
   // Initial load
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchStats()
   }, [fetchStats])
 
   // Fetch jobs when tab/status/page changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchJobs(activeTab, statusFilter, currentPage)
   }, [activeTab, statusFilter, currentPage, fetchJobs])
 

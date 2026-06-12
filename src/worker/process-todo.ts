@@ -119,7 +119,7 @@ async function handleOverdueTodos() {
   )
 
   // Enqueue one branded email per user with their overdue items
-  for (const [userId, todos] of userGroups) {
+  for (const [, todos] of userGroups) {
     const user = todos[0].user
     const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Next.js Boilerplate'
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'

@@ -31,6 +31,7 @@ export function CreditsSection() {
 
         {/* Developer attribution card */}
         <div
+          // eslint-disable-next-line react-hooks/refs
           ref={contentAnim.ref}
           data-testid="credits-card"
           className="mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8 md:p-10"

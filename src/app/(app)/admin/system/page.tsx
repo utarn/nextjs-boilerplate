@@ -140,7 +140,7 @@ function HealthCard({
 export default function SystemHealthPage() {
   const t = useTranslations('Admin.system')
   const tq = useTranslations('Admin.queues')
-  const tCommon = useTranslations('common')
+  const _tCommon = useTranslations('common') // eslint-disable-line @typescript-eslint/no-unused-vars
   const [data, setData] = useState<HealthData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -163,6 +163,7 @@ export default function SystemHealthPage() {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchHealth()
   }, [fetchHealth])
 

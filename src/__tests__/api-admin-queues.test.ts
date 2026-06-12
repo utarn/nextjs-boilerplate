@@ -111,7 +111,6 @@ vi.mock('@/lib/audit', () => ({
 // ---------------------------------------------------------------------------
 // Imports (after mocks)
 // ---------------------------------------------------------------------------
-import { withRoles } from '@/lib/auth'
 import { todoProcessingQueue, emailQueue, exportQueue } from '@/lib/queue'
 import { getQueueJobs, cancelQueueJob, retryQueueJob } from '@/lib/queue-management'
 import { logAuditEvent } from '@/lib/audit'
