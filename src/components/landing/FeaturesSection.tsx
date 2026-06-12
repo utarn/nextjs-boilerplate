@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { LandingImage } from './LandingImage'
 
 /** Feature card keys matching Landing.features.* in locale files */
 const FEATURE_KEYS = ['crud', 'realTime', 'themes', 'backgroundJobs', 'responsive', 'i18n'] as const
@@ -25,26 +24,6 @@ const PLACEHOLDER_LABELS: Record<string, string> = {
   backgroundJobs: 'Background Processing',
   responsive: 'Responsive Design',
   i18n: 'Internationalization',
-}
-
-/** Image filenames for each feature card */
-const FEATURE_IMAGES: Record<string, string> = {
-  crud: 'feature-crud.webp',
-  realTime: 'feature-realtime.webp',
-  themes: 'feature-themes.webp',
-  backgroundJobs: 'feature-background.webp',
-  responsive: 'feature-responsive.webp',
-  i18n: 'feature-i18n.webp',
-}
-
-/** Alt text for each feature image */
-const FEATURE_ALT: Record<string, string> = {
-  crud: 'Task management dashboard showing todo list with CRUD operations',
-  realTime: 'Real-time collaboration updates across team members',
-  themes: 'Gallery of 42 available themes for the application',
-  backgroundJobs: 'Background job processing queue management',
-  responsive: 'Responsive design adapting to mobile and desktop screens',
-  i18n: 'Multilingual support showing English and Thai translations',
 }
 
 /**
@@ -132,8 +111,6 @@ export function FeaturesSection() {
             const isReversed = index % 2 === 1
             const icon = FEATURE_ICONS[key]
             const placeholderLabel = PLACEHOLDER_LABELS[key]
-            const imageFile = FEATURE_IMAGES[key]
-            const imageAlt = FEATURE_ALT[key]
 
             return (
               <div
@@ -152,14 +129,19 @@ export function FeaturesSection() {
                 >
                   {/* Image placeholder */}
                   <div className="w-full max-w-sm flex-1 sm:max-w-md lg:max-w-lg">
-                    <LandingImage
-                      filename={imageFile}
-                      alt={imageAlt}
-                      placeholderLabel={placeholderLabel}
-                      placeholderIcon={icon}
-                      className="w-full py-20 sm:py-32"
-                      imageClassName="w-full rounded-2xl shadow-lg"
-                    />
+                    <div
+                      className="flex w-full items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 py-20 sm:py-32"
+                      data-testid={`landing-placeholder-feature-${key}`}
+                    >
+                      <div className="text-center">
+                        <span className="text-5xl" role="img" aria-label={placeholderLabel}>
+                          {icon}
+                        </span>
+                        <p className="mt-4 text-lg font-medium text-gray-400">
+                          {placeholderLabel}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Text content */}

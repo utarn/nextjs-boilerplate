@@ -445,13 +445,15 @@ export function LoginClient({ googleClientId }: LoginClientProps) {
 
           <div className="flex flex-col items-center max-w-xs">
             <div className="mb-4">
-              <img
-                src="/logo.png"
-                alt={appName}
-                width="256"
-                height="256"
-                className="rounded-xl"
-              />
+              <div
+                className="flex items-center justify-center rounded-xl border-2 border-dashed border-gray-500"
+                style={{ width: 256, height: 256 }}
+                aria-label={`${appName} logo placeholder`}
+              >
+                <span className="text-5xl text-gray-500" role="img" aria-label="Logo">
+                  ✓
+                </span>
+              </div>
             </div>
             <h2 className="mb-2 text-xl font-semibold text-white">{appName}</h2>
             <p className="text-center text-sm text-gray-400 dark:text-white/60">

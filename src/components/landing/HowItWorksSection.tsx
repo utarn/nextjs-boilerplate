@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import { useScrollAnimation, useScrollAnimationItems } from './useScrollAnimation'
-import { LandingImage } from './LandingImage'
 
 const STEP_KEYS = ['step1', 'step2', 'step3'] as const
 
@@ -79,14 +78,19 @@ export function HowItWorksSection() {
             ref={stepRefs[STEP_KEYS.length]}
             data-testid="howitworks-image-placeholder"
           >
-            <LandingImage
-              filename="how-it-works.webp"
-              alt="Illustration showing the 3-step process to get started with TaskFlow"
-              placeholderLabel="How It Works"
-              placeholderIcon="📱"
-              className="w-full py-24 sm:py-32 lg:py-40"
-              imageClassName="w-full rounded-2xl shadow-lg"
-            />
+            <div
+              className="flex w-full items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 py-24 sm:py-32 lg:py-40"
+              data-testid="landing-placeholder-how-it-works.webp"
+            >
+              <div className="text-center">
+                <span className="text-5xl" role="img" aria-label="How It Works">
+                  📱
+                </span>
+                <p className="mt-4 text-lg font-medium text-gray-400">
+                  How It Works
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

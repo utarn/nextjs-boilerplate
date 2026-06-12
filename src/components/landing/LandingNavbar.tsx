@@ -93,8 +93,8 @@ export function LandingNavbar({ isAuthenticated }: LandingNavbarProps) {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         {/* Brand */}
-        <Link href="/" className="font-prompt text-xl font-bold text-gray-900">
-          {t('brand')}
+        <Link href="/" className="flex items-center">
+          <img src="/new_logo.png" alt="Next.js Boilerplate" className="h-8 w-auto" />
         </Link>
 
         {/* Section links — desktop */}

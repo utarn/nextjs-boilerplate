@@ -66,7 +66,7 @@ export function AppLayout({ children, user, defaultTheme, defaultColorMode }: Ap
       {/* Desktop sidebar */}
       <div className="hidden md:flex h-full w-64 flex-col fixed inset-y-0 z-50 border-r">
         <div className="p-4 border-b">
-          <h1 className="text-xl font-bold">Next.js Boilerplate</h1>
+          <img src="/new_logo.png" alt="Next.js Boilerplate" className="h-8 w-auto" />
         </div>
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => (
@@ -135,7 +135,7 @@ export function AppLayout({ children, user, defaultTheme, defaultColorMode }: Ap
             </div>
           </SheetContent>
         </Sheet>
-        <h1 className="text-lg font-bold ml-4">Next.js Boilerplate</h1>
+        <img src="/new_logo.png" alt="Next.js Boilerplate" className="ml-4 h-7 w-auto" />
       </div>
 
       {/* Top bar */}

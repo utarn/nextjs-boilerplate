@@ -11,6 +11,10 @@ const appName = process.env.NEXT_PUBLIC_APP_NAME || 'Next.js Boilerplate'
 export const metadata: Metadata = {
   title: appName,
   description: 'Production-ready Next.js boilerplate template',
+  icons: {
+    icon: '/new_logo.png',
+    apple: '/new_logo.png',
+  },
 }
 
 export default async function RootLayout({

@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import { useScrollAnimation } from './useScrollAnimation'
-import { LandingImage } from './LandingImage'
 
 /**
  * Credits section — "Built with Leading Technology"
@@ -39,14 +38,16 @@ export function CreditsSection() {
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
             {/* Photo placeholder */}
             <div data-testid="credits-photo-placeholder">
-              <LandingImage
-                filename="developer-photo.webp"
-                alt="Developer photo"
-                placeholderLabel="Photo"
-                placeholderIcon="👤"
-                className="h-28 w-28 shrink-0 rounded-full sm:h-32 sm:w-32"
-                imageClassName="h-28 w-28 sm:h-32 sm:w-32 rounded-full object-cover shadow-md"
-              />
+              <div
+                className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-300 bg-gray-100 sm:h-32 sm:w-32"
+                data-testid="landing-placeholder-developer-photo.webp"
+              >
+                <div className="text-center">
+                  <span className="text-3xl sm:text-4xl" role="img" aria-label="Photo">
+                    👤
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Attribution block */}

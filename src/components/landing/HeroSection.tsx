@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { LandingImage } from './LandingImage'
 
 interface HeroSectionProps {
   isAuthenticated: boolean
@@ -83,14 +82,19 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
 
         {/* Hero image placeholder */}
         <div className="mt-4 w-full max-w-3xl sm:mt-8">
-          <LandingImage
-            filename="hero-main.webp"
-            alt="TaskFlow hero screenshot showing task management dashboard"
-            placeholderLabel="Task Dashboard Preview"
-            placeholderIcon="✓"
-            className="w-full py-16 sm:py-24"
-            imageClassName="w-full rounded-2xl shadow-lg"
-          />
+          <div
+            className="flex w-full items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-100 py-16 sm:py-24"
+            data-testid="landing-placeholder-hero-main.webp"
+          >
+            <div className="text-center">
+              <span className="text-5xl" role="img" aria-label="Task Dashboard Preview">
+                ✓
+              </span>
+              <p className="mt-4 text-lg font-medium text-gray-400">
+                Task Dashboard Preview
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
