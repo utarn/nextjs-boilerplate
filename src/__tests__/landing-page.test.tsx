@@ -84,9 +84,11 @@ describe('LandingNavbar', () => {
     vi.clearAllMocks()
   })
 
-  it('renders brand name', () => {
+  it('renders brand logo image', () => {
     render(<LandingNavbar isAuthenticated={false} />)
-    expect(screen.getByText('navbar.brand')).toBeInTheDocument()
+    const logo = screen.getByAltText('Next.js Boilerplate')
+    expect(logo).toBeInTheDocument()
+    expect(logo).toHaveAttribute('src', '/new_logo.png')
   })
 
   it('renders section anchor links on desktop', () => {
@@ -276,11 +278,10 @@ describe('HeroSection', () => {
     expect(link?.getAttribute('href')).toBe('#valueProps')
   })
 
-  it('renders hero image via LandingImage component', () => {
+  it('renders hero image placeholder', () => {
     render(<HeroSection isAuthenticated={false} />)
-    const img = screen.getByTestId('landing-image-hero-main.webp')
-    expect(img).toBeInTheDocument()
-    expect(img).toHaveAttribute('src', '/landing/hero-main.webp')
+    const placeholder = screen.getByTestId('landing-placeholder-hero-main.webp')
+    expect(placeholder).toBeInTheDocument()
   })
 
   it('renders decorative shapes (blue and gold)', () => {

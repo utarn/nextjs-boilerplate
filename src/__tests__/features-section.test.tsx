@@ -75,15 +75,15 @@ describe('FeaturesSection', () => {
     expect(screen.getByText('features.i18n.description')).toBeInTheDocument()
   })
 
-  it('renders image placeholders via LandingImage component', () => {
+  it('renders image placeholders for each feature card', () => {
     renderFeaturesSection()
 
-    expect(screen.getByTestId('landing-image-feature-crud.webp')).toBeInTheDocument()
-    expect(screen.getByTestId('landing-image-feature-realtime.webp')).toBeInTheDocument()
-    expect(screen.getByTestId('landing-image-feature-themes.webp')).toBeInTheDocument()
-    expect(screen.getByTestId('landing-image-feature-background.webp')).toBeInTheDocument()
-    expect(screen.getByTestId('landing-image-feature-responsive.webp')).toBeInTheDocument()
-    expect(screen.getByTestId('landing-image-feature-i18n.webp')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-feature-crud')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-feature-realTime')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-feature-themes')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-feature-backgroundJobs')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-feature-responsive')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-feature-i18n')).toBeInTheDocument()
   })
 
   it('has scroll-snap container with mandatory snap type', () => {

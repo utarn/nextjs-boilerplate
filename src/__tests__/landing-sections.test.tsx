@@ -138,7 +138,7 @@ describe('HowItWorksSection', () => {
   it('renders an image placeholder via LandingImage', () => {
     render(<HowItWorksSection />)
 
-    expect(screen.getByTestId('landing-image-how-it-works.webp')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-how-it-works.webp')).toBeInTheDocument()
   })
 
   it('has the howItWorks section id', () => {
@@ -265,7 +265,7 @@ describe('CreditsSection', () => {
   it('renders a photo placeholder via LandingImage', () => {
     render(<CreditsSection />)
 
-    expect(screen.getByTestId('landing-image-developer-photo.webp')).toBeInTheDocument()
+    expect(screen.getByTestId('landing-placeholder-developer-photo.webp')).toBeInTheDocument()
   })
 
   it('renders the tech stack from i18n', () => {
