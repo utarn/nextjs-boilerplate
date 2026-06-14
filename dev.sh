@@ -42,6 +42,14 @@ until docker compose exec -T redis redis-cli ping >/dev/null 2>&1; do
 done
 echo "Infra ready."
 
+# ── Install deps if needed ──────────────────────────────────────────
+echo "Checking dependencies..."
+npm install --prefer-offline 2>&1 | tail -1
+
+# ── Generate Prisma client ───────────────────────────────────────────
+echo "Generating Prisma client..."
+npx prisma generate
+
 # ── Run migrations + seed ─────────────────────────────────────────
 echo "Running migrations..."
 npx prisma migrate deploy
