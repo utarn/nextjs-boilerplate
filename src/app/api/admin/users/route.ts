@@ -28,6 +28,14 @@ export async function GET(request: NextRequest) {
         prisma.webUser.findMany({
           where,
           orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            email: true,
+            displayName: true,
+            role: true,
+            status: true,
+            createdAt: true,
+          },
         }),
         prisma.webUser.count({ where }),
       ])
