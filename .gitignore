@@ -20,6 +20,10 @@ prisma/migrations/*
 # Testing
 coverage/
 
+# Playwright
+playwright/.auth/
+playwright/test-results/
+
 # Storage (data directory only, not src/lib/storage/)
 /storage/
 uploads/
