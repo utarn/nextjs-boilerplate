@@ -19,7 +19,11 @@
     "test:unit": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts --no-file-parallelism",
     "test:all": "npm run test:unit && npm run test:integration",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:install": "playwright install"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
@@ -54,6 +58,7 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.3.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
