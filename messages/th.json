@@ -20,7 +20,8 @@
     "retry": "ลองใหม่",
     "status": "สถานะ",
     "processing": "กำลังดำเนินการ",
-    "finished": "เสร็จสิ้น"
+    "finished": "เสร็จสิ้น",
+    "refresh": "รีเฟรช"
   },
   "Login": {
     "title": "เข้าสู่ระบบ",

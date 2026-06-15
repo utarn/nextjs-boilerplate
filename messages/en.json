@@ -20,7 +20,8 @@
     "retry": "Retry",
     "status": "Status",
     "processing": "Processed",
-    "finished": "Finished"
+    "finished": "Finished",
+    "refresh": "Refresh"
   },
   "Login": {
     "title": "Sign In",
