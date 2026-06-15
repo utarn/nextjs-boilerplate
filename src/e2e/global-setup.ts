@@ -10,6 +10,7 @@
 import { execSync } from 'child_process'
 import { existsSync } from 'fs'
 import { resolve } from 'path'
+import dotenv from 'dotenv'
 
 const PROJECT_ROOT = process.cwd()
 
@@ -19,6 +20,7 @@ function run(cmd: string): string {
     stdio: 'pipe',
     encoding: 'utf-8',
     timeout: 120_000,
+    env: { ...process.env },
   })
 }
 
@@ -44,6 +46,14 @@ function isContainerRunning(name: string): boolean {
 }
 
 export default async function globalSetup(): Promise<void> {
+  // Load .env so that DATABASE_URL, REDIS_URL, ENCRYPTION_SECRET, etc. are
+  // available to child processes (prisma, tsx seed, etc.).
+  const envPath = resolve(PROJECT_ROOT, '.env')
+  if (existsSync(envPath)) {
+    dotenv.config({ path: envPath })
+    console.log('[global-setup] Loaded environment from .env')
+  }
+
   console.log('\n[global-setup] Starting E2E environment setup...\n')
 
   if (!hasDocker()) {
