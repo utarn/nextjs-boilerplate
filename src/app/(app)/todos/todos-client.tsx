@@ -11,6 +11,8 @@ import {
   XCircle,
   Paperclip,
   Pencil,
+  LayoutGrid,
+  Table as TableIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -28,6 +30,9 @@ import {
 } from '@/components/ui/dialog'
 import { useSocketEvent } from '@/components/providers/SocketProvider'
 import type { TodoCreatedPayload, TodoUpdatedPayload, TodoDeletedPayload } from '@/lib/channel-types'
+import { DataTable } from '@/components/datatable'
+import type { Column, SortState, PaginationMeta } from '@/components/datatable'
+import { buildTodoQueryParams, TODO_PAGE_SIZE } from '@/lib/todo-query'
 
 type TodoStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
 type TodoPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
@@ -77,6 +82,15 @@ export function TodosPageClient() {
   const t = useTranslations('todos')
   const tCommon = useTranslations('common')
   const [todos, setTodos] = useState<Todo[]>([])
+  const [view, setView] = useState<'cards' | 'table'>('cards')
+  const [sort, setSort] = useState<SortState>(null)
+  const [page, setPage] = useState(1)
+  const [pagination, setPagination] = useState<PaginationMeta>({
+    page: 1,
+    limit: TODO_PAGE_SIZE,
+    total: 0,
+    totalPages: 1,
+  })
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
@@ -102,22 +116,34 @@ export function TodosPageClient() {
 
   const fetchTodos = useCallback(async () => {
     try {
-      const res = await fetch('/api/todos')
+      const params = buildTodoQueryParams({
+        sort: sort?.field ?? null,
+        order: sort?.order ?? 'desc',
+        page,
+        limit: TODO_PAGE_SIZE,
+      })
+      const res = await fetch(`/api/todos?${params.toString()}`)
       if (res.ok) {
-        const data = await res.json()
-        setTodos(data)
+        const json = await res.json()
+        setTodos(json.data)
+        setPagination(json.pagination)
       }
     } catch (err) {
       console.error('Failed to fetch todos:', err)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [sort, page])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchTodos()
   }, [fetchTodos])
+
+  const handleSortChange = (next: SortState) => {
+    setSort(next)
+    setPage(1)
+  }
 
   // Real-time updates — typed socket events
   useSocketEvent<TodoCreatedPayload>('todo:created', () => {
@@ -303,6 +329,70 @@ export function TodosPageClient() {
     return t(style.label)
   }
 
+  const columns: Column<Todo>[] = [
+    {
+      key: 'title',
+      header: t('titlePlaceholder'),
+      sortable: true,
+      render: (todo) => (
+        <span className={todo.status === 'COMPLETED' ? 'line-through text-muted-foreground' : ''}>
+          {todo.title}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: t('status'),
+      sortable: true,
+      render: (todo) => {
+        const StatusIcon = STATUS_ICON[todo.status]
+        return (
+          <span className="inline-flex items-center gap-1">
+            <StatusIcon className={`h-4 w-4 ${STATUS_COLOR[todo.status]}`} />
+            {todo.status === 'PENDING'
+              ? t('pending')
+              : todo.status === 'IN_PROGRESS'
+                ? t('inProgress')
+                : todo.status === 'COMPLETED'
+                  ? t('completed')
+                  : t('cancelled')}
+          </span>
+        )
+      },
+    },
+    {
+      key: 'priority',
+      header: t('priority'),
+      sortable: true,
+      render: (todo) => (
+        <Badge variant="outline" className={PRIORITY_STYLES[todo.priority].class}>
+          {formatPriority(todo.priority)}
+        </Badge>
+      ),
+    },
+    {
+      key: 'dueDate',
+      header: t('dueDate'),
+      sortable: true,
+      render: (todo) =>
+        todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : '—',
+    },
+    {
+      key: 'actions',
+      header: tCommon('edit'),
+      render: (todo) => (
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => openEditDialog(todo)} title={tCommon('edit')}>
+            <Pencil className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => deleteTodo(todo.id)} title={tCommon('delete')}>
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
+      ),
+    },
+  ]
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -419,6 +509,26 @@ export function TodosPageClient() {
         </Dialog>
       </div>
 
+      <div className="flex items-center gap-2 mb-4">
+        <Button
+          variant={view === 'cards' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setView('cards')}
+        >
+          <LayoutGrid className="h-4 w-4 mr-1" />
+          {t('viewCards')}
+        </Button>
+        <Button
+          variant={view === 'table' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setView('table')}
+        >
+          <TableIcon className="h-4 w-4 mr-1" />
+          {t('viewTable')}
+        </Button>
+      </div>
+
+      {view === 'cards' && (
       <Tabs defaultValue="all">
         <TabsList>
           <TabsTrigger value="all">
@@ -521,6 +631,25 @@ export function TodosPageClient() {
           </TabsContent>
         ))}
       </Tabs>
+      )}
+
+      {view === 'table' && (
+        <DataTable
+          columns={columns}
+          data={filterTodos(undefined)}
+          rowKey={(todo) => todo.id}
+          sort={sort}
+          onSortChange={handleSortChange}
+          pagination={pagination}
+          onPageChange={setPage}
+          labels={{
+            previous: t('previous'),
+            next: t('next'),
+            of: t('of'),
+          }}
+          emptyMessage={t('noData')}
+        />
+      )}
 
       {/* Edit Dialog */}
       <Dialog

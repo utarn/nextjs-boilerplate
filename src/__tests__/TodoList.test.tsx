@@ -82,9 +82,13 @@ describe('TodoList', () => {
   })
 
   it('renders todo list after loading', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => mockTodos })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: mockTodos,
+        pagination: { page: 1, limit: 10, total: mockTodos.length, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -95,9 +99,13 @@ describe('TodoList', () => {
   })
 
   it('shows empty state when no todos', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => [] })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [],
+        pagination: { page: 1, limit: 10, total: 0, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -109,9 +117,13 @@ describe('TodoList', () => {
   })
 
   it('renders filter tabs', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => mockTodos })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: mockTodos,
+        pagination: { page: 1, limit: 10, total: mockTodos.length, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -128,9 +140,13 @@ describe('TodoList', () => {
   })
 
   it('todo items show title and priority badge', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => mockTodos })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: mockTodos,
+        pagination: { page: 1, limit: 10, total: mockTodos.length, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -144,9 +160,13 @@ describe('TodoList', () => {
   })
 
   it('create dialog opens and has form fields', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => [] })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [],
+        pagination: { page: 1, limit: 10, total: 0, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -166,9 +186,13 @@ describe('TodoList', () => {
   })
 
   it('create dialog validates required title field', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => [] })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [],
+        pagination: { page: 1, limit: 10, total: 0, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -194,7 +218,13 @@ describe('TodoList', () => {
   it('error messages display for storage/quota errors', async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => [] }) // initial fetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [],
+          pagination: { page: 1, limit: 10, total: 0, totalPages: 1 },
+        }),
+      }) // initial fetch
       .mockResolvedValueOnce({
         ok: false,
         status: 413,
@@ -232,9 +262,13 @@ describe('TodoList', () => {
   })
 
   it('edit dialog opens when edit button clicked', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => mockTodos })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: mockTodos,
+        pagination: { page: 1, limit: 10, total: mockTodos.length, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -253,9 +287,13 @@ describe('TodoList', () => {
   })
 
   it('delete button renders for each todo', async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => mockTodos })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: mockTodos,
+        pagination: { page: 1, limit: 10, total: mockTodos.length, totalPages: 1 },
+      }),
+    })
 
     renderWithProviders(<TodosPageClient />)
 
@@ -265,5 +303,51 @@ describe('TodoList', () => {
 
     const deleteButtons = screen.getAllByTitle('Delete')
     expect(deleteButtons).toHaveLength(2)
+  })
+
+  it('shows a Cards/Table view toggle and defaults to Cards', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: mockTodos,
+        pagination: { page: 1, limit: 10, total: mockTodos.length, totalPages: 1 },
+      }),
+    })
+
+    renderWithProviders(<TodosPageClient />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Todo 1')).toBeInTheDocument()
+    })
+
+    // Both toggle buttons render; Cards is active by default
+    expect(screen.getByRole('button', { name: 'Cards' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Table' })).toBeInTheDocument()
+  })
+
+  it('switching to Table view renders the DataTable headers', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: mockTodos,
+        pagination: { page: 1, limit: 10, total: mockTodos.length, totalPages: 1 },
+      }),
+    })
+
+    renderWithProviders(<TodosPageClient />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Todo 1')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Table' }))
+
+    await waitFor(() => {
+      // Table column headers from the todo column definitions.
+      // The title header is t('titlePlaceholder') = "Todo title" (kept for E2E targeting).
+      expect(screen.getByRole('button', { name: 'Todo title' })).toBeInTheDocument()
+      expect(screen.getByText('Status')).toBeInTheDocument()
+      expect(screen.getByText('Priority')).toBeInTheDocument()
+    })
   })
 })
