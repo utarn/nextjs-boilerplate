@@ -9,16 +9,51 @@ import { eventBus } from '@/lib/event-bus'
 import { getStorageAdapter } from '@/lib/storage'
 import { TodoPriority } from '@/generated/client'
 import { sendQuotaWarningEmail } from '@/lib/email'
+import {
+  TODO_SORTABLE_FIELDS,
+  TODO_MAX_LIMIT,
+  TODO_PAGE_SIZE,
+} from '@/lib/todo-query'
 
 export async function GET(request: NextRequest) {
   try {
     return await withAuth(request, async (user) => {
-      const todos = await prisma.todo.findMany({
-        where: { userId: user.userId },
-        orderBy: { createdAt: 'desc' },
-      })
+      const { searchParams } = new URL(request.url)
 
-      return NextResponse.json(todos)
+      // ---- sort (whitelisted) ----
+      const sortRaw = searchParams.get('sort')
+      const sort = TODO_SORTABLE_FIELDS.includes(sortRaw as never)
+        ? (sortRaw as (typeof TODO_SORTABLE_FIELDS)[number])
+        : null
+      const order = searchParams.get('order') === 'asc' ? 'asc' : 'desc'
+      const orderBy = sort ? { [sort]: order } : { createdAt: 'desc' }
+
+      // ---- pagination (clamped) ----
+      const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1)
+      const limit = Math.min(
+        TODO_MAX_LIMIT,
+        Math.max(1, parseInt(searchParams.get('limit') || String(TODO_PAGE_SIZE), 10) || TODO_PAGE_SIZE),
+      )
+      const skip = (page - 1) * limit
+
+      // ---- status filter (optional) ----
+      const status = searchParams.get('status')
+      const where: { userId: string; status?: string } = { userId: user.userId }
+      if (status && status !== 'all') {
+        where.status = status
+      }
+
+      const [todos, total] = await Promise.all([
+        prisma.todo.findMany({ where, orderBy, skip, take: limit }),
+        prisma.todo.count({ where }),
+      ])
+
+      const totalPages = Math.max(1, Math.ceil(total / limit))
+
+      return NextResponse.json({
+        data: todos,
+        pagination: { page, limit, total, totalPages },
+      })
     })
   } catch (err) {
     return handleRouteError(err)

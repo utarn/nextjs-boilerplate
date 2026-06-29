@@ -80,6 +80,7 @@ vi.mock('@/lib/prisma', () => {
     prisma: {
       todo: {
         findMany: vi.fn().mockResolvedValue([mockTodo]),
+        count: vi.fn().mockResolvedValue(1),
         findFirst: vi.fn().mockResolvedValue(mockTodo),
         create: vi.fn().mockResolvedValue(mockTodo),
         update: vi.fn().mockResolvedValue(mockTodo),
@@ -201,23 +202,92 @@ describe('api/todos', () => {
   // -----------------------------------------------------------------------
 
   describe('GET /api/todos', () => {
-    it('returns todos for authenticated user', async () => {
+    it('returns todos in a { data, pagination } envelope for authenticated user', async () => {
       const mockTodos = [
         { id: '1', title: 'Todo 1', userId: 'user-1' },
         { id: '2', title: 'Todo 2', userId: 'user-1' },
       ]
       ;(prisma.todo.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce(mockTodos)
+      ;(prisma.todo.count as ReturnType<typeof vi.fn>).mockResolvedValueOnce(2)
 
       const req = new NextRequest('http://localhost:3000/api/todos')
       const response = await GET(req)
 
       expect(response.status).toBe(200)
       const data = await response.json()
-      expect(data).toHaveLength(2)
-      expect(prisma.todo.findMany).toHaveBeenCalledWith({
-        where: { userId: 'user-1' },
-        orderBy: { createdAt: 'desc' },
+      expect(data.data).toHaveLength(2)
+      expect(data.pagination).toEqual({ page: 1, limit: 10, total: 2, totalPages: 1 })
+      expect(prisma.todo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'user-1' },
+          orderBy: { createdAt: 'desc' },
+          skip: 0,
+          take: 10,
+        }),
+      )
+      expect(prisma.todo.count).toHaveBeenCalledWith({ where: { userId: 'user-1' } })
+    })
+
+    it('applies server-side sort + pagination from query params', async () => {
+      ;(prisma.todo.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce([])
+      ;(prisma.todo.count as ReturnType<typeof vi.fn>).mockResolvedValueOnce(25)
+
+      const req = new NextRequest(
+        'http://localhost:3000/api/todos?sort=title&order=asc&page=3&limit=10',
+      )
+      const response = await GET(req)
+
+      expect(response.status).toBe(200)
+      const data = await response.json()
+      expect(data.pagination).toEqual({ page: 3, limit: 10, total: 25, totalPages: 3 })
+      expect(prisma.todo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { title: 'asc' },
+          skip: 20,
+          take: 10,
+        }),
+      )
+    })
+
+    it('falls back to default sort when sort field is not whitelisted', async () => {
+      ;(prisma.todo.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce([])
+      ;(prisma.todo.count as ReturnType<typeof vi.fn>).mockResolvedValueOnce(0)
+
+      const req = new NextRequest(
+        'http://localhost:3000/api/todos?sort=attachmentSize&order=desc',
+      )
+      await GET(req)
+
+      expect(prisma.todo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ orderBy: { createdAt: 'desc' } }),
+      )
+    })
+
+    it('filters by status when status param is set', async () => {
+      ;(prisma.todo.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce([])
+      ;(prisma.todo.count as ReturnType<typeof vi.fn>).mockResolvedValueOnce(0)
+
+      const req = new NextRequest('http://localhost:3000/api/todos?status=PENDING')
+      await GET(req)
+
+      expect(prisma.todo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { userId: 'user-1', status: 'PENDING' } }),
+      )
+      expect(prisma.todo.count).toHaveBeenCalledWith({
+        where: { userId: 'user-1', status: 'PENDING' },
       })
+    })
+
+    it('clamps limit to TODO_MAX_LIMIT', async () => {
+      ;(prisma.todo.findMany as ReturnType<typeof vi.fn>).mockResolvedValueOnce([])
+      ;(prisma.todo.count as ReturnType<typeof vi.fn>).mockResolvedValueOnce(0)
+
+      const req = new NextRequest('http://localhost:3000/api/todos?limit=9999')
+      await GET(req)
+
+      expect(prisma.todo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ take: 100 }),
+      )
     })
   })
 
