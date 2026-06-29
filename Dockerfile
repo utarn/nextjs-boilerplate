@@ -3,9 +3,13 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies
+# Pin npm to v11 to match the version the lockfile was generated with
+# (node:22-alpine ships npm 10, whose resolver disagrees with this lock —
+# `npm ci` fails with "Missing: @swc/helpers@0.5.23 / typescript@5.9.3").
+# Mirrors the line-collector / lab-check setup.
 FROM base AS deps
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install -g npm@11 && npm ci
 
 # Development stage
 FROM base AS dev

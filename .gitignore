@@ -14,8 +14,13 @@ build/
 .env.production.local
 
 # Prisma
+# Migrations are tracked (force-added); the rules below keep the lock file and
+# migration directories trackable while ignoring stray files Prisma may drop
+# at the migrations root. Mirrors the lab-check setup.
 prisma/migrations/*
 !prisma/migrations/README.md
+!prisma/migrations/migration_lock.toml
+!prisma/migrations/**/
 
 # Testing
 coverage/
@@ -50,3 +55,13 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Docker
+docker-compose.override.yml
+socket-server.bundle.mjs
+
+# Claude Code local state
+.claude/worktrees/

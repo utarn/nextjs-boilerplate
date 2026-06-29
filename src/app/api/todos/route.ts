@@ -7,7 +7,7 @@ import { enforceUserQuota, checkUserQuota, getStorageUsage } from '@/lib/quota'
 import { handleRouteError } from '@/lib/route-guard'
 import { eventBus } from '@/lib/event-bus'
 import { getStorageAdapter } from '@/lib/storage'
-import { TodoPriority } from '@/generated/client'
+import { TodoPriority, TodoStatus, Prisma } from '@/generated/client'
 import { sendQuotaWarningEmail } from '@/lib/email'
 import {
   TODO_SORTABLE_FIELDS,
@@ -26,7 +26,11 @@ export async function GET(request: NextRequest) {
         ? (sortRaw as (typeof TODO_SORTABLE_FIELDS)[number])
         : null
       const order = searchParams.get('order') === 'asc' ? 'asc' : 'desc'
-      const orderBy = sort ? { [sort]: order } : { createdAt: 'desc' }
+      // The sort field is whitelisted above, so the dynamic key is always a
+      // valid Todo orderBy field. Cast to the Prisma input type so the build's
+      // type check accepts the computed key (a plain `{ [sort]: order }` widens
+      // to a string index signature Prisma rejects).
+      const orderBy = { [sort ?? 'createdAt']: order } as Prisma.TodoOrderByWithRelationInput
 
       // ---- pagination (clamped) ----
       const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10) || 1)
@@ -36,11 +40,12 @@ export async function GET(request: NextRequest) {
       )
       const skip = (page - 1) * limit
 
-      // ---- status filter (optional) ----
+      // ---- status filter (optional, validated against the TodoStatus enum) ----
       const status = searchParams.get('status')
-      const where: { userId: string; status?: string } = { userId: user.userId }
-      if (status && status !== 'all') {
-        where.status = status
+      const TODO_STATUSES: TodoStatus[] = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']
+      const where: { userId: string; status?: TodoStatus } = { userId: user.userId }
+      if (status && status !== 'all' && TODO_STATUSES.includes(status as TodoStatus)) {
+        where.status = status as TodoStatus
       }
 
       const [todos, total] = await Promise.all([

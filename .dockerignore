@@ -1,9 +1,54 @@
-node_modules
-.next
+# VCS
 .git
 .gitignore
+
+# Dependencies (regenerated in the image via npm ci)
+node_modules
+
+# Next.js build output (rebuilt in the builder stage)
+.next
+out
+build
+dist
+
+# Environment files — never bake into the image
 .env
 .env.local
+.env.*.local
+
+# Prisma generated client — regenerated in every stage via `prisma generate`
+src/generated
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Testing / E2E artifacts
 coverage
+playwright/.auth
+playwright/test-results
+
+# Storage (bind-mounted or volume-backed at runtime, not baked in)
 storage
+uploads
+
+# Tooling / local state — not needed in the build context
+.claude
+.fallow
+docs
+.vercel
+
+# Docker compose files (the image is built from the Dockerfile, not compose)
+docker-compose.yml
+docker-compose.override.yml
+docker-compose.*.yml
+
+# Compiled Socket.IO server bundle (rebuilt by esbuild in the builder stage)
+socket-server.bundle.mjs
+
+# Logs / temp
 *.log
+*.tmp
+*.temp
+.cache/
+.DS_Store
+Thumbs.db
