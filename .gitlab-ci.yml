@@ -20,7 +20,7 @@ stages:
   - build
 
 variables:
-  # Tag format YYYYMMDD-HHMM; override per-job if needed.
+  # Git short SHA; override per-job if a different tag scheme is wanted.
   TAG: "${CI_COMMIT_SHORT_SHA}"
 
 build:app:
