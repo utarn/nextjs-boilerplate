@@ -310,6 +310,33 @@ const worker = new Worker('todo-processing', async (job) => {
 }, { connection: getRedisConnection() })
 ```
 
+### Reusable DataTable Pattern
+
+A generic, server-side sortable + paginated `<DataTable>` lives in
+`src/components/datatable/`, built on the shadcn `table.tsx` primitives (no
+extra dependency). The Todos page uses it behind a Cards/Table view toggle.
+
+- `Column<T>` defines `key`, `header`, `sortable?`, `render?(row) => ReactNode`.
+- Sort cycle: unsorted → asc → desc → unsorted. The caller owns `sort` + `pagination` state and refetches on change.
+- API contract: `GET /api/todos?sort=...&order=...&page=...&limit=...&status=...` returns `{ data, pagination: { page, limit, total, totalPages } }`. The sort field is whitelisted server-side (`TODO_SORTABLE_FIELDS` in `src/lib/todo-query.ts`).
+
+```typescript
+import { DataTable } from '@/components/datatable'
+import type { Column, SortState } from '@/components/datatable'
+
+const columns: Column<Todo>[] = [
+  { key: 'title', header: 'Title', sortable: true, render: (r) => r.title },
+  // ...
+]
+
+<DataTable columns={columns} data={rows} rowKey={(r) => r.id}
+  sort={sort} onSortChange={setSort}
+  pagination={pagination} onPageChange={setPage}
+  labels={{ previous: 'Prev', next: 'Next', of: 'of' }} />
+```
+
+To add a sortable column: extend `TODO_SORTABLE_FIELDS` (server whitelist), add the `Column` to the page, and add an index in `schema.prisma` if the field isn't already indexed for the `(userId, field)` query.
+
 ### Audit Logging Pattern
 
 ```typescript
@@ -379,6 +406,16 @@ await storage.delete(key)
 | redis | 6388 | Redis for queues and pub/sub (different from .env default 6386) |
 
 Note: Docker compose uses ports 5442/6388 internally, while `docker-compose.yml` and `.env.example` may reference different port defaults for local-only development.
+
+## Infra: nginx + GitLab CI
+
+- `nginx/app.conf` — sample reverse-proxy config (HTTP proxy + `/socket.io/`
+  WebSocket upgrade). Install on the host, set `server_name`, add TLS via
+  certbot. See `nginx/README.md`.
+- `.gitlab-ci.yml` — builds the `runner` (app) and `worker` Dockerfile targets,
+  tags `${CI_COMMIT_SHORT_SHA}` + `latest`, pushes to GitLab's built-in
+  registry (`$CI_REGISTRY_IMAGE`). Runs on `main`. Replace the image names
+  (`boilerplate-app`, `boilerplate-worker`) when cloning.
 
 ## Testing Conventions
 
