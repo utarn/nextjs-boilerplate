@@ -33,11 +33,14 @@ test.beforeAll(async ({ browser }) => {
     .getByRole('heading', { name: PAGE_HEADING })
     .waitFor({ state: 'visible', timeout: 15_000 })
 
-  // Delete all existing todos via the authenticated browser context
+  // Delete all existing todos via the authenticated browser context.
+  // The /api/todos route returns a `{ data, pagination }` envelope; the
+  // `?? json` fallback keeps this tolerant if the shape ever reverts.
   await page.evaluate(async () => {
     const res = await fetch('/api/todos')
     if (res.ok) {
-      const todos = await res.json()
+      const json = await res.json()
+      const todos = json.data ?? json
       for (const todo of todos) {
         await fetch(`/api/todos/${todo.id}`, { method: 'DELETE' })
       }
@@ -199,5 +202,56 @@ test.describe('Todo CRUD', () => {
     await expect(page.getByText('Delete Me Todo')).not.toBeVisible()
     // The "All" tab count should reflect the deletion (remaining todos from
     // earlier tests stay in the list, so the empty state is not asserted here).
+  })
+
+  test('table view sorts by title and paginates', async ({ page }) => {
+    // Clean up any todos left by earlier CRUD tests in this file (create,
+    // edit, status-cycle, filter). The beforeAll cleanup only runs once at
+    // the start of the file, and beforeEach does not clean — so leftover
+    // todos could push the total above 12 and make totalPages exceed 2,
+    // breaking the "Page 1 of 2" / "Page 2 of 2" assertions below.
+    await page.evaluate(async () => {
+      const res = await fetch('/api/todos')
+      if (res.ok) {
+        const json = await res.json()
+        const todos = json.data ?? json
+        for (const todo of todos) {
+          await fetch(`/api/todos/${todo.id}`, { method: 'DELETE' })
+        }
+      }
+    })
+
+    // Seed enough todos to span two pages (TODO_PAGE_SIZE = 10)
+    for (let i = 0; i < 12; i++) {
+      await page.getByRole('button', { name: 'Add Todo' }).click()
+      await expect(page.locator('#create-title')).toBeVisible()
+      await page.locator('#create-title').fill(`Table Todo ${String(i).padStart(2, '0')}`)
+      await page.getByRole('dialog').getByRole('button', { name: 'Add Todo' }).click()
+      await expect(page.getByText(`Table Todo ${String(i).padStart(2, '0')}`)).toBeVisible()
+    }
+
+    // Switch to Table view
+    await page.getByRole('button', { name: 'Table' }).click()
+
+    // Sort by Title ascending — the header is a button labelled "Todo title"
+    await page.getByRole('button', { name: 'Todo title' }).click()
+
+    // Page 1 of 2 should be visible
+    await expect(page.getByText(/Page 1 of 2/)).toBeVisible({ timeout: 5_000 })
+
+    // Go to page 2
+    await page.getByRole('button', { name: 'Next' }).click()
+    await expect(page.getByText(/Page 2 of 2/)).toBeVisible({ timeout: 5_000 })
+
+    // Clean up the seeded todos so later tests start fresh
+    await page.evaluate(async () => {
+      const res = await fetch('/api/todos')
+      if (res.ok) {
+        const json = await res.json()
+        for (const todo of json.data ?? json) {
+          await fetch(`/api/todos/${todo.id}`, { method: 'DELETE' })
+        }
+      }
+    })
   })
 })
