@@ -105,5 +105,6 @@ model Todo {
 
   user            WebUser       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, createdAt])
   @@map("todos")
 }
