@@ -1,2 +1,3 @@
 export { DataTable } from './DataTable'
-export type { Column, SortState, SortOrder, PaginationState, PaginationMeta, DataTableProps } from './columns'
+export type { DataTableProps } from './DataTable'
+export type { Column, SortState, SortOrder, PaginationMeta } from './columns'

@@ -36,8 +36,9 @@ test.beforeAll(async ({ browser }) => {
   // Delete all existing todos via the authenticated browser context.
   // The /api/todos route returns a `{ data, pagination }` envelope; the
   // `?? json` fallback keeps this tolerant if the shape ever reverts.
+  // Use ?limit=100 so cleanup fetches all todos (default page returns 10).
   await page.evaluate(async () => {
-    const res = await fetch('/api/todos')
+    const res = await fetch('/api/todos?limit=100')
     if (res.ok) {
       const json = await res.json()
       const todos = json.data ?? json
@@ -211,7 +212,7 @@ test.describe('Todo CRUD', () => {
     // todos could push the total above 12 and make totalPages exceed 2,
     // breaking the "Page 1 of 2" / "Page 2 of 2" assertions below.
     await page.evaluate(async () => {
-      const res = await fetch('/api/todos')
+      const res = await fetch('/api/todos?limit=100')
       if (res.ok) {
         const json = await res.json()
         const todos = json.data ?? json
@@ -245,7 +246,7 @@ test.describe('Todo CRUD', () => {
 
     // Clean up the seeded todos so later tests start fresh
     await page.evaluate(async () => {
-      const res = await fetch('/api/todos')
+      const res = await fetch('/api/todos?limit=100')
       if (res.ok) {
         const json = await res.json()
         for (const todo of json.data ?? json) {

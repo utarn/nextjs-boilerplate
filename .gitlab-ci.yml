@@ -5,7 +5,7 @@
 #   - runner (the app, custom server.js + Socket.IO)
 #   - worker (the BullMQ background worker)
 #
-# Both are tagged with a timestamp + `latest` and pushed to GitLab's built-in
+# Both are tagged with the Git short SHA + `latest` and pushed to GitLab's built-in
 # container registry ($CI_REGISTRY_IMAGE). No hardcoded registry host — set
 # CI/CD variables in the project for anything secret.
 #

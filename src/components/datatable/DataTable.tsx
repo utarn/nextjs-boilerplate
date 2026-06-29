@@ -12,7 +12,7 @@ import {
 import { Pagination, type PaginationLabels } from '@/components/ui/pagination'
 import type { Column, PaginationMeta, SortState } from './columns'
 
-interface DataTableProps<T> {
+export interface DataTableProps<T> {
   columns: Column<T>[]
   data: T[]
   rowKey: (row: T) => string

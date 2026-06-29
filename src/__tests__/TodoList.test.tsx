@@ -348,6 +348,8 @@ describe('TodoList', () => {
       expect(screen.getByRole('button', { name: 'Todo title' })).toBeInTheDocument()
       expect(screen.getByText('Status')).toBeInTheDocument()
       expect(screen.getByText('Priority')).toBeInTheDocument()
+      // Verify the data path: a todo title renders in a row.
+      expect(screen.getByText('Test Todo 1')).toBeInTheDocument()
     })
   })
 })

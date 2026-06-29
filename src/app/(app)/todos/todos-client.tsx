@@ -32,7 +32,7 @@ import { useSocketEvent } from '@/components/providers/SocketProvider'
 import type { TodoCreatedPayload, TodoUpdatedPayload, TodoDeletedPayload } from '@/lib/channel-types'
 import { DataTable } from '@/components/datatable'
 import type { Column, SortState, PaginationMeta } from '@/components/datatable'
-import { buildTodoQueryParams, TODO_PAGE_SIZE } from '@/lib/todo-query'
+import { buildTodoQueryParams, TODO_PAGE_SIZE, TODO_MAX_LIMIT } from '@/lib/todo-query'
 
 type TodoStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
 type TodoPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
@@ -119,8 +119,8 @@ export function TodosPageClient() {
       const params = buildTodoQueryParams({
         sort: sort?.field ?? null,
         order: sort?.order ?? 'desc',
-        page,
-        limit: TODO_PAGE_SIZE,
+        page: view === 'cards' ? 1 : page,
+        limit: view === 'cards' ? TODO_MAX_LIMIT : TODO_PAGE_SIZE,
       })
       const res = await fetch(`/api/todos?${params.toString()}`)
       if (res.ok) {
@@ -133,7 +133,7 @@ export function TodosPageClient() {
     } finally {
       setLoading(false)
     }
-  }, [sort, page])
+  }, [sort, page, view])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -642,6 +642,7 @@ export function TodosPageClient() {
           onSortChange={handleSortChange}
           pagination={pagination}
           onPageChange={setPage}
+          loading={loading}
           labels={{
             previous: t('previous'),
             next: t('next'),

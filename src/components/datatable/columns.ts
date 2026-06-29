@@ -1,17 +1,13 @@
 // ---------------------------------------------------------------------------
-// DataTable type contracts — framework-agnostic (no React) so they can be
-// imported by tests, API routes, and the component alike.
+// DataTable type contracts — no React runtime imports (React.ReactNode is
+// used via the global React type namespace), so they can be imported by
+// tests, API routes, and the component alike.
 // ---------------------------------------------------------------------------
 
 export type SortOrder = 'asc' | 'desc'
 
 /** null = unsorted. */
 export type SortState = { field: string; order: SortOrder } | null
-
-export interface PaginationState {
-  page: number
-  limit: number
-}
 
 export interface PaginationMeta {
   page: number
@@ -36,14 +32,3 @@ export interface Column<T> {
   render?: (row: T) => React.ReactNode
 }
 
-export interface DataTableProps<T> {
-  columns: Column<T>[]
-  data: T[]
-  rowKey: (row: T) => string
-  sort: SortState
-  onSortChange: (next: SortState) => void
-  pagination: PaginationMeta
-  onPageChange: (page: number) => void
-  emptyMessage?: string
-  loading?: boolean
-}
