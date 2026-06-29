@@ -112,7 +112,18 @@
     "errorTitleRequired": "กรุณากรอกชื่อรายการ",
     "errorStorageQuota": "พื้นที่จัดเก็บเต็ม โปรดเพิ่มพื้นที่ว่าง",
     "errorCreateFailed": "ไม่สามารถสร้างรายการได้",
-    "errorUpdateFailed": "ไม่สามารถอัปเดตรายการได้"
+    "errorUpdateFailed": "ไม่สามารถอัปเดตรายการได้",
+    "sortBy": "เรียงตาม",
+    "sortAscending": "น้อยไปมาก",
+    "sortDescending": "มากไปน้อย",
+    "sortUnsorted": "ไม่เรียง",
+    "page": "หน้า",
+    "of": "จาก",
+    "next": "ถัดไป",
+    "previous": "ก่อนหน้า",
+    "viewCards": "การ์ด",
+    "viewTable": "ตาราง",
+    "noData": "ยังไม่มีสิ่งที่ต้องทำ สร้างรายการเพื่อเริ่มต้น!"
   },
   "Dashboard": {
     "title": "แดชบอร์ด",

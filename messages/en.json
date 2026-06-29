@@ -112,7 +112,18 @@
     "errorTitleRequired": "Title is required",
     "errorStorageQuota": "Storage quota exceeded. Please free up space.",
     "errorCreateFailed": "Failed to create todo",
-    "errorUpdateFailed": "Failed to update todo"
+    "errorUpdateFailed": "Failed to update todo",
+    "sortBy": "Sort by",
+    "sortAscending": "Ascending",
+    "sortDescending": "Descending",
+    "sortUnsorted": "Unsorted",
+    "page": "Page",
+    "of": "of",
+    "next": "Next",
+    "previous": "Previous",
+    "viewCards": "Cards",
+    "viewTable": "Table",
+    "noData": "No todos yet. Create one to get started!"
   },
   "Dashboard": {
     "title": "Dashboard",
