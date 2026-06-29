@@ -1,0 +1,55 @@
+# ---------------------------------------------------------------------------
+# GitLab CI for the Next.js boilerplate.
+#
+# Builds two images from the single Dockerfile:
+#   - runner (the app, custom server.js + Socket.IO)
+#   - worker (the BullMQ background worker)
+#
+# Both are tagged with a timestamp + `latest` and pushed to GitLab's built-in
+# container registry ($CI_REGISTRY_IMAGE). No hardcoded registry host — set
+# CI/CD variables in the project for anything secret.
+#
+# Prerequisites:
+#   - A shell runner with docker + git available (tags: shell, docker)
+#   - DOCKER_AUTH_CONFIG or a logged-in docker daemon that can push to
+#     $CI_REGISTRY (GitLab injects $CI_REGISTRY_USER / $CI_REGISTRY_PASSWORD
+#     automatically when using the registry; see the before_script).
+# ---------------------------------------------------------------------------
+
+stages:
+  - build
+
+variables:
+  # Tag format YYYYMMDD-HHMM; override per-job if needed.
+  TAG: "${CI_COMMIT_SHORT_SHA}"
+
+build:app:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  retry: 2
+  only:
+    - main
+  before_script:
+    # Log into GitLab's built-in registry using the CI job token.
+    - echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - docker build --target runner -t "$CI_REGISTRY_IMAGE/boilerplate-app:$TAG" -t "$CI_REGISTRY_IMAGE/boilerplate-app:latest" -f Dockerfile .
+    - docker push "$CI_REGISTRY_IMAGE/boilerplate-app:$TAG"
+    - docker push "$CI_REGISTRY_IMAGE/boilerplate-app:latest"
+
+build:worker:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  retry: 2
+  only:
+    - main
+  before_script:
+    - echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - docker build --target worker -t "$CI_REGISTRY_IMAGE/boilerplate-worker:$TAG" -t "$CI_REGISTRY_IMAGE/boilerplate-worker:latest" -f Dockerfile .
+    - docker push "$CI_REGISTRY_IMAGE/boilerplate-worker:$TAG"
+    - docker push "$CI_REGISTRY_IMAGE/boilerplate-worker:latest"
